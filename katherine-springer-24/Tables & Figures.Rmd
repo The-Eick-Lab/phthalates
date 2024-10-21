@@ -1,0 +1,1703 @@
+---
+title: "Tables and Figures"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load Packages
+```{r}
+library("table1")
+library("haven")
+library("ggplot2")
+library("tidyverse")
+library("ggpubr")
+library("haven")
+library("dotwhisker")
+library("broom")
+library("dplyr")
+library("naniar")
+library("tableone")
+library("writexl")
+library("readxl")
+library("psych")
+library("EnvStats")
+library("gtools")
+library("corrplot")
+
+```
+
+# MAIN MATERIAL
+
+## Table 1
+Distribution of sociodemographic characteristics, clinical characteristics, and depression and anxiety symptoms among pregnant people and infants in a subset of the Atlanta African American Maternal-Child Cohort, 2016–2020 (N = 81)
+```{r}
+## Analytic Sample (Table 1)
+Covars <- c( "arousal_index_PCA_score", "attention_index_PCA_score", "correctedagedays1wk",
+            "marital",  "educ_cat", "income_cat", "alc.smoke", "parity", "insurance", "Site_Prenatal", "sex", 
+            "mat_age", "ppbmi", "final_ga", "birth_weight",  "epds", "stai_cat","epds_cat"
+            )
+CatVars <- c( "marital", "educ_cat", "income_cat", "alc.smoke", "parity", "insurance", "Site_Prenatal", "sex", 
+             "epds_cat", "stai_cat")
+             # "ACE_severe", "JHP.binary", "keod.binary")
+
+TableOne <- CreateTableOne(vars=Covars, data=CompleteData, factorVars= CatVars)
+print(TableOne)
+summary(TableOne)
+
+```
+
+## Table 2
+Distributions of averaged, urinary phthalate exposure concentrations in the Atlanta African American Maternal-Child Cohort (ng/mL) (N = 81)
+
+```{r}
+#### PHTHALATE DISTRIBUTION TABLE ####
+#Calculate Geometric Means and Standard Deviations for Distribution Table
+geometric.mean(CompleteData$gm_MEP,na.rm=TRUE)
+geoSD(CompleteData$gm_MEP, na.rm=TRUE)
+# geometric.mean(CompleteData$MEP_v1,na.rm=TRUE)
+# geoSD(CompleteData$MEP_v1, na.rm=TRUE)
+# geometric.mean(CompleteData$MEP_v2, na.rm= TRUE)
+# geoSD(CompleteData$MEP_v2, na.rm=TRUE)
+
+geometric.mean(CompleteData$gm_MBP,na.rm=TRUE)
+geoSD(CompleteData$gm_MBP, na.rm=TRUE)
+# geometric.mean(CompleteData$MBP_v1,na.rm=TRUE)
+# geoSD(CompleteData$MBP_v1, na.rm=TRUE)
+# geometric.mean(CompleteData$MBP_v2, na.rm= TRUE)
+# geoSD(CompleteData$MBP_v2, na.rm=TRUE)
+
+geometric.mean(CompleteData$gm_MiBP,na.rm=TRUE)
+geoSD(CompleteData$gm_MiBP, na.rm=TRUE)
+# geometric.mean(CompleteData$MiBP_v1,na.rm=TRUE)
+# geoSD(CompleteData$MiBP_v1, na.rm=TRUE)
+# geometric.mean(CompleteData$MiBP_v2, na.rm= TRUE)
+# geoSD(CompleteData$MiBP_v2, na.rm=TRUE)
+
+geometric.mean(CompleteData$gm_MBzP,na.rm=TRUE)
+geoSD(CompleteData$gm_MBzP, na.rm=TRUE)
+# geometric.mean(CompleteData$MBzP_v1,na.rm=TRUE)
+# geoSD(CompleteData$MBzP_v1, na.rm=TRUE)
+# geometric.mean(CompleteData$MBzP_v2, na.rm= TRUE)
+# geoSD(CompleteData$MBzP_v2, na.rm=TRUE)
+
+geometric.mean(CompleteData$gm_MEHP,na.rm=TRUE)
+geoSD(CompleteData$gm_MEHP, na.rm=TRUE)
+# geometric.mean(CompleteData$MEHP_v1,na.rm=TRUE)
+# geoSD(CompleteData$MEHP_v1, na.rm=TRUE)
+# geometric.mean(CompleteData$MEHP_v2, na.rm= TRUE)
+# geoSD(CompleteData$MEHP_v2, na.rm=TRUE)
+
+geometric.mean(CompleteData$gm_MEOHP,na.rm=TRUE)
+geoSD(CompleteData$gm_MEOHP, na.rm=TRUE)
+# geometric.mean(CompleteData$MEOHP_v1,na.rm=TRUE)
+# geoSD(CompleteData$MEOHP_v1, na.rm=TRUE)
+# geometric.mean(CompleteData$MEOHP_v2, na.rm= TRUE)
+# geoSD(CompleteData$MEOHP_v2, na.rm=TRUE)
+
+geometric.mean(CompleteData$gm_MEHHP,na.rm=TRUE)
+geoSD(CompleteData$gm_MEHHP, na.rm=TRUE)
+# geometric.mean(CompleteData$MEHHP_v1,na.rm=TRUE)
+# geoSD(CompleteData$MEHHP_v1, na.rm=TRUE)
+# geometric.mean(CompleteData$MEHHP_v2, na.rm= TRUE)
+# geoSD(CompleteData$MEHHP_v2, na.rm=TRUE)
+
+geometric.mean(CompleteData$gm_MECPP,na.rm=TRUE)
+geoSD(CompleteData$gm_MECPP, na.rm=TRUE)
+# geometric.mean(CompleteData$MECPP_v1,na.rm=TRUE)
+# geoSD(CompleteData$MECPP_v1, na.rm=TRUE)
+# geometric.mean(CompleteData$MECPP_v2, na.rm= TRUE)
+# geoSD(CompleteData$MECPP_v2, na.rm=TRUE)
+
+geometric.mean(CompleteData$gm_DEHP,na.rm=TRUE)
+geoSD(CompleteData$gm_DEHP, na.rm=TRUE)
+# geometric.mean(CompleteData$DEHP_v1,na.rm=TRUE)
+# geoSD(CompleteData$DEHP_v1, na.rm=TRUE)
+# geometric.mean(CompleteData$DEHP_v2, na.rm= TRUE)
+# geoSD(CompleteData$DEHP_v2, na.rm=TRUE)
+
+#Calculate percentiles for each visit
+quantile(CompleteData$gm_MEP, c(.05, .25, .50, .75, .95))
+#quantile(CompleteData$MEP_v2, c(.05, .25, .50, .75, .95), na.rm= TRUE)
+
+quantile(CompleteData$gm_MBP, c(.05, .25, .50, .75, .95))
+#quantile(CompleteData$MBP_v2, c(.05, .25, .50, .75, .95), na.rm= TRUE)
+
+quantile(CompleteData$gm_MiBP, c(.05, .25, .50, .75, .95))
+#quantile(CompleteData$MiBP_v2, c(.05, .25, .50, .75, .95), na.rm= TRUE)
+
+quantile(CompleteData$gm_MBzP, c(.05, .25, .50, .75, .95))
+#quantile(CompleteData$MBzP_v2, c(.05, .25, .50, .75, .95), na.rm= TRUE)
+
+quantile(CompleteData$gm_MEHP, c(.05, .25, .50, .75, .95))
+#quantile(CompleteData$MEHP_v2, c(.05, .25, .50, .75, .95), na.rm= TRUE)
+
+quantile(CompleteData$gm_MEOHP, c(.05, .25, .50, .75, .95))
+#quantile(CompleteData$MEOHP_v2, c(.05, .25, .50, .75, .95), na.rm= TRUE)
+
+quantile(CompleteData$gm_MEHHP, c(.05, .25, .50, .75, .95))
+#quantile(CompleteData$MEHHP_v2, c(.05, .25, .50, .75, .95), na.rm= TRUE)
+
+quantile(CompleteData$gm_MECPP, c(.05, .25, .50, .75, .95))
+#quantile(CompleteData$MECPP_v2, c(.05, .25, .50, .75, .95), na.rm= TRUE)
+
+quantile(CompleteData$gm_DEHP, c(.05, .25, .50, .75, .95))
+
+## Detection Frequencies
+
+Detection_freq <- Chemical[Chemical$subjectid %in% CompleteData$subjectid, ]
+prop.table(table(Detection_freq$MEP_CC))
+prop.table(table(Detection_freq$MBP_CC))
+prop.table(table(Detection_freq$MiBP_CC))
+prop.table(table(Detection_freq$MBzP_CC))
+prop.table(table(Detection_freq$MEHP_CC))
+prop.table(table(Detection_freq$MEOHP_CC))
+prop.table(table(Detection_freq$MEHHP_CC))
+prop.table(table(Detection_freq$MECPP_CC))
+
+
+```
+
+## Figure 1
+Associations between an interquartile range increase in of natural log transformed average urinary phthalate exposure (ng/mL) and infant attention and arousal scores among a subset of the African American Maternal-Child Cohort, 2016–2020 (N = 81). Note: Models are adjusted for creatinine, infant sex, infant age at assessment, maternal age, maternal education, and early pregnancy body mass index
+```{r}
+#### GRAPHING ####
+desired_levels <- c("MBPar", "MBPar1", "MBzPar", "MBzPar1", "MECPPar", "MECPPar1", "MEHPar", "MEHPar1", "MEHHPar", "MEHHPar1", "MEOHPar", "MEOHPar1", "MEPar", "MEPar1", "MiBPar", "MiBPar1", "DEHPar", "DEHPar1")
+
+##### FIG 1: Average Newborn Attention and Arousal #####
+adj.linear.models.plot <- function(dt){
+  
+  
+  MEPat<-lm(attention_index_PCA_score~ MEP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt)
+  MEPat.output<-cbind(round(MEPat$coefficients,2)[2], round(confint(MEPat),2)[2],round(confint(MEPat),2)[2,2])
+  
+  MBPat<-lm(attention_index_PCA_score~MBP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt)
+  MBPat.output<-cbind(round(MBPat$coefficients,2)[2], round(confint(MBPat),2)[2],round(confint(MBPat),2)[2,2])
+  
+  MBzPat<-lm(attention_index_PCA_score~MBzP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt)
+  MBzPat.output<-cbind(round(MBzPat$coefficients,2)[2], round(confint(MBzPat),2)[2],round(confint(MBzPat),2)[2,2])
+  
+  MEHPat<-lm(attention_index_PCA_score~MEHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt)
+  MEHPat.output<-cbind(round(MEHPat$coefficients,2)[2], round(confint(MEHPat),2)[2],round(confint(MEHPat),2)[2,2])
+  
+  MEOHPat<-lm(attention_index_PCA_score~MEOHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt)
+  MEOHPat.output<-cbind(round(MEOHPat$coefficients,2)[2], round(confint(MEOHPat),2)[2],round(confint(MEOHPat),2)[2,2])
+  
+  MEHHPat<-lm(attention_index_PCA_score~MEHHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt)
+  MEHHPat.output<-cbind(round(MEHHPat$coefficients,2)[2], round(confint(MEHHPat),2)[2],round(confint(MEHHPat),2)[2,2])
+  
+  MECPPat<-lm(attention_index_PCA_score~MECPP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt)
+  MECPPat.output<-cbind(round(MECPPat$coefficients,2)[2], round(confint(MECPPat),2)[2],round(confint(MECPPat),2)[2,2])
+  
+  MiBPat<-lm(attention_index_PCA_score~MiBP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt)
+  MiBPat.output<-cbind(round(MiBPat$coefficients,2)[2], round(confint(MiBPat),2)[2],round(confint(MiBPat),2)[2,2])
+  
+  DEHPat<-lm(attention_index_PCA_score~DEHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt)
+  DEHPat.output<-cbind(round(DEHPat$coefficients,2)[2], round(confint(DEHPat),2)[2],round(confint(DEHPat),2)[2,2])
+  
+  MEPar<-lm(arousal_index_PCA_score~ MEP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt)
+  MEPar.output<-cbind(round(MEPar$coefficients,2)[2], round(confint(MEPar),2)[2],round(confint(MEPar),2)[2,2])
+  
+  MBPar<-lm(arousal_index_PCA_score~MBP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt)
+  MBPar.output<-cbind(round(MBPar$coefficients,2)[2], round(confint(MBPar),2)[2],round(confint(MBPar),2)[2,2])
+  
+  MBzPar<-lm(arousal_index_PCA_score~MBzP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt)
+  MBzPar.output<-cbind(round(MBzPar$coefficients,2)[2], round(confint(MBzPar),2)[2],round(confint(MBzPar),2)[2,2])
+  
+  MEHPar<-lm(arousal_index_PCA_score~MEHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt)
+  MEHPar.output<-cbind(round(MEHPar$coefficients,2)[2], round(confint(MEHPar),2)[2],round(confint(MEHPar),2)[2,2])
+  
+  MEOHPar<-lm(arousal_index_PCA_score~MEOHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt)
+  MEOHPar.output<-cbind(round(MEOHPar$coefficients,2)[2], round(confint(MEOHPar),2)[2],round(confint(MEOHPar),2)[2,2])
+  
+  MEHHPar<-lm(arousal_index_PCA_score~MEHHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt)
+  MEHHPar.output<-cbind(round(MEHHPar$coefficients,2)[2], round(confint(MEHHPar),2)[2],round(confint(MEHHPar),2)[2,2])
+  
+  MECPPar<-lm(arousal_index_PCA_score~MECPP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt)
+  MECPPar.output<-cbind(round(MECPPar$coefficients,2)[2], round(confint(MECPPar),2)[2],round(confint(MECPPar),2)[2,2])
+  
+  MiBPar<-lm(arousal_index_PCA_score~MiBP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt)
+  MiBPar.output<-cbind(round(MiBPar$coefficients,2)[2], round(confint(MiBPar),2)[2],round(confint(MiBPar),2)[2,2])
+  
+  DEHPar<-lm(arousal_index_PCA_score~DEHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt)
+  DEHPar.output<-cbind(round(DEHPar$coefficients,2)[2], round(confint(DEHPar),2)[2],round(confint(DEHPar),2)[2,2])
+  
+  adj.models<-rbind(MEPat.output,
+                    MEPar.output,
+                    MBPat.output,
+                    MBPar.output,
+                    MBzPat.output,
+                    MBzPar.output,
+                    MEHPat.output,
+                    MEHPar.output,
+                    MEOHPat.output,
+                    MEOHPar.output,
+                    MEHHPat.output,
+                    MEHHPar.output,
+                    MECPPat.output,
+                    MECPPar.output,
+                    MiBPat.output,
+                    MiBPar.output,
+                    DEHPat.output,
+                    DEHPar.output)
+  
+  rownames(adj.models)<-c("MEPat", "MEPar", "MBPat", "MBPar", "MBzPat","MBzPar", "MEHPat", "MEHPar",
+                          "MEOHPat","MEOHPar", "MEHHPat","MEHHPar", "MECPPat", "MECPPar", "MiBPat", "MiBPar", "DEHPat", "DEHPar")
+  colnames(adj.models)<-c("beta","ll", "ul")
+  #View(adj.models)
+  clipr::write_clip(adj.models)
+}
+adj.ga.forest <- adj.linear.models.plot(dt=CompleteData)
+
+adj.ga.forest <- as.data.frame(adj.ga.forest)
+adj.ga.forest$POP <- rownames(adj.ga.forest)
+adj.ga.forest$POP <- factor(adj.ga.forest$POP,
+                            levels = c("MEPat",
+                                       "MEPar",
+                                       "MBPat",
+                                       "MBPar",
+                                       "MiBPat",
+                                       "MiBPar",
+                                       "MBzPat",
+                                       "MBzPar",
+                                       "MEHPat",
+                                       "MEHPar",
+                                       "MEOHPat",
+                                       "MEOHPar",
+                                       "MEHHPat",
+                                       "MEHHPar",
+                                       "MECPPat",
+                                       "MECPPar",
+                                       "DEHPat",
+                                       "DEHPar"),
+                            labels = c("MEPat",
+                                       "MEPar",
+                                       "MBPat",
+                                       "MBPar",
+                                       "MiBPat",
+                                       "MiBPar",
+                                       "MBzPat",
+                                       "MBzPar",
+                                       "MEHPat",
+                                       "MEHPar",
+                                       "MEOHPat",
+                                       "MEOHPar",
+                                       "MEHHPat",
+                                       "MEHHPar",
+                                       "MECPPat",
+                                       "MECPPar",
+                                       "DEHPat",
+                                       "DEHPar"))
+adj.ga.forest$phthalate <- factor(adj.ga.forest$POP,
+                                  levels = c("MEPat",
+                                             "MEPar",
+                                             "MBPat",
+                                             "MBPar",
+                                             "MiBPat",
+                                             "MiBPar",
+                                             "MBzPat",
+                                             "MBzPar",
+                                             "MEHPat",
+                                             "MEHPar",
+                                             "MEOHPat",
+                                             "MEOHPar",
+                                             "MEHHPat",
+                                             "MEHHPar",
+                                             "MECPPat",
+                                             "MECPPar",
+                                             "DEHPat",
+                                             "DEHPar"),
+                                  labels = c("MEP",
+                                             "MEP",
+                                             "MBP",
+                                             "MBP",
+                                             "MiBP",
+                                             "MiBP",
+                                             "MBzP",
+                                             "MBzP",
+                                             "MEHP",
+                                             "MEHP",
+                                             "MEOHP",
+                                             "MEOHP",
+                                             "MEHHP",
+                                             "MEHHP",
+                                             "MECPP",
+                                             "MECPP",
+                                             "DEHP",
+                                             "DEHP"))
+
+adj.ga.forest$Group <- ifelse(adj.ga.forest$POP=="MEPat" | adj.ga.forest$POP=="MBPat" | adj.ga.forest$POP=="MiBPat" | adj.ga.forest$POP=="MBzPat" |
+                                adj.ga.forest$POP=="MEHPat" | adj.ga.forest$POP=="MEOHPat" | adj.ga.forest$POP=="MEHHPat" | adj.ga.forest$POP=="MECPPat"| adj.ga.forest$POP=="DEHPat", "Attention", "Arousal")
+
+adj.ga.forest$Group <- factor(adj.ga.forest$Group,
+                              levels=c("Attention",
+                                       "Arousal"),
+                              labels =c("Newborn Attention",
+                                        "Newborn Arousal"))
+
+adj.ga.forest$beta <- as.numeric(adj.ga.forest$beta)
+adj.ga.forest$ll <- as.numeric(adj.ga.forest$ll)
+adj.ga.forest$ul <- as.numeric(adj.ga.forest$ul)
+
+
+forestplot_phthalates <- ggplot(data=adj.ga.forest, aes(x=phthalate, y=beta, ymin=ll, ymax=ul, color=Group)) +
+  geom_pointrange(position=position_dodge(width = 0.5), color="slategrey") + 
+  geom_hline(yintercept=0, lty=2) +
+  ylab("\u03B2 (95% CI)") +
+  theme_bw() +
+  coord_flip() +
+  facet_wrap(~Group) +
+  theme(title = element_text(size = 16, face="bold", color = "black"),
+        axis.title.x = element_text(size = 12, face="bold", color = "black"),
+        axis.title.y = element_blank(),
+        axis.text.x = element_text(size = 12, face="bold", color = "black"),
+        axis.text.y = element_text(size = 12, face="bold", color = "black"),
+        strip.text = element_text(size = 12, face="bold", color = "black"),
+        legend.title =element_blank()) +
+  scale_x_discrete(limits = rev(levels(adj.ga.forest$phthalate)))
+forestplot_phthalates
+
+
+
+```
+
+## Figure 2
+Associations between an interquartile range increase in natural log transformed average urinary phthalate exposures (ng/mL) and infant attention and arousal scores among a subset of the African American Maternal-Child Cohort, 2016–2020, stratified by averaged anxiety symptoms (N = 54 for low anxiety symptoms, N = 27 for high anxiety symptoms). Note: Models are adjusted for creatinine, infant sex, infant age at assessment, maternal age, maternal education, and early pregnancy body mass index. High anxiety symptoms were defined as an STAI score > 40
+```{r}
+##### FIG 2: NEWBORN ATTENTON AND AROUSAL STRATIFIED ON ANXIETY #####
+
+# Arousal plot stratified STAI
+lowstai.ar.plot <- function(dt){
+  
+  MEPar<-lm(arousal_index_PCA_score ~ MEP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==0)
+  MEPar.output<-cbind(round(MEPar$coefficients,2)[2], round(confint(MEPar),2)[2],round(confint(MEPar),2)[2,2])
+  
+  MBPar<-lm(arousal_index_PCA_score ~ MBP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==0)
+  MBPar.output<-cbind(round(MBPar$coefficients,2)[2], round(confint(MBPar),2)[2],round(confint(MBPar),2)[2,2])
+  
+  MBzPar<-lm(arousal_index_PCA_score~MBzP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==0)
+  MBzPar.output<-cbind(round(MBzPar$coefficients,2)[2], round(confint(MBzPar),2)[2],round(confint(MBzPar),2)[2,2])
+  
+  MEHPar<-lm(arousal_index_PCA_score~MEHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==0)
+  MEHPar.output<-cbind(round(MEHPar$coefficients,2)[2], round(confint(MEHPar),2)[2],round(confint(MEHPar),2)[2,2])
+  
+  MEOHPar<-lm(arousal_index_PCA_score~MEOHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==0)
+  MEOHPar.output<-cbind(round(MEOHPar$coefficients,2)[2], round(confint(MEOHPar),2)[2],round(confint(MEOHPar),2)[2,2])
+  
+  MEHHPar<-lm(arousal_index_PCA_score~MEHHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==0)
+  MEHHPar.output<-cbind(round(MEHHPar$coefficients,2)[2], round(confint(MEHHPar),2)[2],round(confint(MEHHPar),2)[2,2])
+  
+  MECPPar<-lm(arousal_index_PCA_score~MECPP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==0)
+  MECPPar.output<-cbind(round(MECPPar$coefficients,2)[2], round(confint(MECPPar),2)[2],round(confint(MECPPar),2)[2,2])
+  
+  MiBPar<-lm(arousal_index_PCA_score~MiBP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==0)
+  MiBPar.output<-cbind(round(MiBPar$coefficients,2)[2], round(confint(MiBPar),2)[2],round(confint(MiBPar),2)[2,2])
+  
+  DEHPar<-lm(arousal_index_PCA_score~DEHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==0)
+  DEHPar.output<-cbind(round(DEHPar$coefficients,2)[2], round(confint(DEHPar),2)[2],round(confint(DEHPar),2)[2,2])
+  
+  
+  adj.models<-rbind(MEPar.output,
+                    MBPar.output,
+                    MBzPar.output,
+                    MEHPar.output,
+                    MEOHPar.output,
+                    MEHHPar.output,
+                    MECPPar.output,
+                    MiBPar.output,
+                    DEHPar.output)
+  
+  rownames(adj.models)<-c("MEP", "MBP", "MBzP", "MEHP","MEOHP", "MEHHP", "MECPP", "MiBP", "DEHP")
+  colnames(adj.models)<-c("beta","ll", "ul")
+  #View(adj.models)
+  clipr::write_clip(adj.models)
+}
+
+highstai.ar.plot <- function(dt){
+  
+  MEPar<-lm(arousal_index_PCA_score~ MEP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==1)
+  MEPar.output<-cbind(round(MEPar$coefficients,2)[2], round(confint(MEPar),2)[2],round(confint(MEPar),2)[2,2])
+  
+  MBPar<-lm(arousal_index_PCA_score~MBP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==1)
+  MBPar.output<-cbind(round(MBPar$coefficients,2)[2], round(confint(MBPar),2)[2],round(confint(MBPar),2)[2,2])
+  
+  MBzPar<-lm(arousal_index_PCA_score~MBzP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==1)
+  MBzPar.output<-cbind(round(MBzPar$coefficients,2)[2], round(confint(MBzPar),2)[2],round(confint(MBzPar),2)[2,2])
+  
+  MEHPar<-lm(arousal_index_PCA_score~MEHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==1)
+  MEHPar.output<-cbind(round(MEHPar$coefficients,2)[2], round(confint(MEHPar),2)[2],round(confint(MEHPar),2)[2,2])
+  
+  MEOHPar<-lm(arousal_index_PCA_score~MEOHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==1)
+  MEOHPar.output<-cbind(round(MEOHPar$coefficients,2)[2], round(confint(MEOHPar),2)[2],round(confint(MEOHPar),2)[2,2])
+  
+  MEHHPar<-lm(arousal_index_PCA_score~MEHHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==1)
+  MEHHPar.output<-cbind(round(MEHHPar$coefficients,2)[2], round(confint(MEHHPar),2)[2],round(confint(MEHHPar),2)[2,2])
+  
+  MECPPar<-lm(arousal_index_PCA_score~MECPP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==1)
+  MECPPar.output<-cbind(round(MECPPar$coefficients,2)[2], round(confint(MECPPar),2)[2],round(confint(MECPPar),2)[2,2])
+  
+  MiBPar<-lm(arousal_index_PCA_score~MiBP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==1)
+  MiBPar.output<-cbind(round(MiBPar$coefficients,2)[2], round(confint(MiBPar),2)[2],round(confint(MiBPar),2)[2,2])
+  
+  DEHPar<-lm(arousal_index_PCA_score~DEHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==1)
+  DEHPar.output<-cbind(round(DEHPar$coefficients,2)[2], round(confint(DEHPar),2)[2],round(confint(DEHPar),2)[2,2])
+  
+  adj.models<-rbind(MEPar.output,
+                    MBPar.output,
+                    MBzPar.output,
+                    MEHPar.output,
+                    MEOHPar.output,
+                    MEHHPar.output,
+                    MECPPar.output,
+                    MiBPar.output,
+                    DEHPar.output)
+  
+  rownames(adj.models)<-c("MEP", "MBP", "MBzP", "MEHP","MEOHP", "MEHHP", "MECPP", "MiBP", "DEHP")
+  colnames(adj.models)<-c("beta","ll", "ul")
+  clipr::write_clip(adj.models)
+}
+
+lowstai.ar.forest <- lowstai.ar.plot(dt=CompleteData)
+highstai.ar.forest <- highstai.ar.plot(dt=CompleteData)
+lowstai.ar.forest <- as.data.frame(lowstai.ar.forest)
+highstai.ar.forest <- as.data.frame(highstai.ar.forest)
+lowstai.ar.forest$staiscore <- 0
+highstai.ar.forest$staiscore <- 1
+desired_levels <- c("MEP", "MBP", "MBzP", "MEHP","MEOHP", "MEHHP", "MECPP", "MiBP", "DEHP")
+lowstai.ar.forest$phthalate <- factor(rownames(lowstai.ar.forest), levels = desired_levels, ordered = TRUE)
+highstai.ar.forest$phthalate <- factor(rownames(highstai.ar.forest), levels = desired_levels, ordered = TRUE)
+
+# Attention Stratified on Anxiety
+lowstai.at.plot <- function(dt){
+  
+  MEPat<-lm(attention_index_PCA_score ~ MEP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==0)
+  MEPat.output<-cbind(round(MEPat$coefficients,2)[2], round(confint(MEPat),2)[2],round(confint(MEPat),2)[2,2])
+  
+  MBPat<-lm(attention_index_PCA_score ~ MBP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==0)
+  MBPat.output<-cbind(round(MBPat$coefficients,2)[2], round(confint(MBPat),2)[2],round(confint(MBPat),2)[2,2])
+  
+  MBzPat<-lm(attention_index_PCA_score~MBzP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==0)
+  MBzPat.output<-cbind(round(MBzPat$coefficients,2)[2], round(confint(MBzPat),2)[2],round(confint(MBzPat),2)[2,2])
+  
+  MEHPat<-lm(attention_index_PCA_score~MEHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==0)
+  MEHPat.output<-cbind(round(MEHPat$coefficients,2)[2], round(confint(MEHPat),2)[2],round(confint(MEHPat),2)[2,2])
+  
+  MEOHPat<-lm(attention_index_PCA_score~MEOHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==0)
+  MEOHPat.output<-cbind(round(MEOHPat$coefficients,2)[2], round(confint(MEOHPat),2)[2],round(confint(MEOHPat),2)[2,2])
+  
+  MEHHPat<-lm(attention_index_PCA_score~MEHHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==0)
+  MEHHPat.output<-cbind(round(MEHHPat$coefficients,2)[2], round(confint(MEHHPat),2)[2],round(confint(MEHHPat),2)[2,2])
+  
+  MECPPat<-lm(attention_index_PCA_score~MECPP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==0)
+  MECPPat.output<-cbind(round(MECPPat$coefficients,2)[2], round(confint(MECPPat),2)[2],round(confint(MECPPat),2)[2,2])
+  
+  MiBPat<-lm(attention_index_PCA_score~MiBP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==0)
+  MiBPat.output<-cbind(round(MiBPat$coefficients,2)[2], round(confint(MiBPat),2)[2],round(confint(MiBPat),2)[2,2])
+  
+  DEHPat<-lm(attention_index_PCA_score~DEHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==0)
+  DEHPat.output<-cbind(round(DEHPat$coefficients,2)[2], round(confint(DEHPat),2)[2],round(confint(DEHPat),2)[2,2])
+  
+  adj.models<-rbind(MEPat.output,
+                    MBPat.output,
+                    MBzPat.output,
+                    MEHPat.output,
+                    MEOHPat.output,
+                    MEHHPat.output,
+                    MECPPat.output,
+                    MiBPat.output,
+                    DEHPat.output)
+  
+  rownames(adj.models)<-c("MEP", "MBP", "MBzP", "MEHP","MEOHP", "MEHHP", "MECPP", "MiBP", "DEHP")
+  colnames(adj.models)<-c("beta","ll", "ul")
+  #View(adj.models)
+  clipr::write_clip(adj.models)
+}
+
+highstai.at.plot <- function(dt){
+  
+  MEPat<-lm(attention_index_PCA_score~ MEP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==1)
+  MEPat.output<-cbind(round(MEPat$coefficients,2)[2], round(confint(MEPat),2)[2],round(confint(MEPat),2)[2,2])
+  
+  MBPat<-lm(attention_index_PCA_score~MBP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==1)
+  MBPat.output<-cbind(round(MBPat$coefficients,2)[2], round(confint(MBPat),2)[2],round(confint(MBPat),2)[2,2])
+  
+  MBzPat<-lm(attention_index_PCA_score~MBzP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==1)
+  MBzPat.output<-cbind(round(MBzPat$coefficients,2)[2], round(confint(MBzPat),2)[2],round(confint(MBzPat),2)[2,2])
+  
+  MEHPat<-lm(attention_index_PCA_score~MEHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==1)
+  MEHPat.output<-cbind(round(MEHPat$coefficients,2)[2], round(confint(MEHPat),2)[2],round(confint(MEHPat),2)[2,2])
+  
+  MEOHPat<-lm(attention_index_PCA_score~MEOHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==1)
+  MEOHPat.output<-cbind(round(MEOHPat$coefficients,2)[2], round(confint(MEOHPat),2)[2],round(confint(MEOHPat),2)[2,2])
+  
+  MEHHPat<-lm(attention_index_PCA_score~MEHHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==1)
+  MEHHPat.output<-cbind(round(MEHHPat$coefficients,2)[2], round(confint(MEHHPat),2)[2],round(confint(MEHHPat),2)[2,2])
+  
+  MECPPat<-lm(attention_index_PCA_score~MECPP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==1)
+  MECPPat.output<-cbind(round(MECPPat$coefficients,2)[2], round(confint(MECPPat),2)[2],round(confint(MECPPat),2)[2,2])
+  
+  MiBPat<-lm(attention_index_PCA_score~MiBP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==1)
+  MiBPat.output<-cbind(round(MiBPat$coefficients,2)[2], round(confint(MiBPat),2)[2],round(confint(MiBPat),2)[2,2])
+  
+  DEHPat<-lm(attention_index_PCA_score~DEHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$stai_cat==1)
+  DEHPat.output<-cbind(round(DEHPat$coefficients,2)[2], round(confint(DEHPat),2)[2],round(confint(DEHPat),2)[2,2])
+  
+  adj.models<-rbind(MEPat.output,
+                    MBPat.output,
+                    MBzPat.output,
+                    MEHPat.output,
+                    MEOHPat.output,
+                    MEHHPat.output,
+                    MECPPat.output,
+                    MiBPat.output,
+                    DEHPat.output)
+  
+  rownames(adj.models)<-c("MEP", "MBP", "MBzP", "MEHP","MEOHP", "MEHHP", "MECPP", "MiBP", "DEHP")
+  colnames(adj.models)<-c("beta","ll", "ul")
+  #View(adj.models)
+  clipr::write_clip(adj.models)
+}
+
+lowstai.at.forest <- lowstai.at.plot(dt=CompleteData)
+highstai.at.forest <- highstai.at.plot(dt=CompleteData)
+lowstai.at.forest <- as.data.frame(lowstai.at.forest)
+highstai.at.forest <- as.data.frame(highstai.at.forest)
+lowstai.at.forest$staiscore <- 0
+highstai.at.forest$staiscore <- 1
+lowstai.at.forest$phthalate <- factor(rownames(lowstai.at.forest), levels= desired_levels, ordered = TRUE)
+highstai.at.forest$phthalate <- factor(rownames(highstai.at.forest),  levels= desired_levels, ordered = TRUE)
+
+## Combine Low and High Plots
+lowstai.ar.forest$type <- "Newborn Arousal"
+highstai.ar.forest$type <- "Newborn Arousal"
+
+lowstai.at.forest$type <- "Newborn Attention"
+highstai.at.forest$type <- "Newborn Attention"
+
+combined_stai <- rbind(lowstai.at.forest, highstai.at.forest, lowstai.ar.forest, highstai.ar.forest)
+combined_stai$staiscore <- factor(combined_stai$staiscore, levels = c(0, 1))
+combined_stai$type <- as.factor(combined_stai$type)
+combined_stai$type <- factor(combined_stai$type, levels = c("Newborn Attention", "Newborn Arousal"))
+
+## Graph the plots
+stai_forestplot <- ggplot(data = combined_stai, aes(x = phthalate, y = beta, ymin = ll, ymax = ul, color = interaction(staiscore))) +
+  geom_pointrange(position = position_dodge(width = 0.5)) +
+  geom_hline(yintercept = 0, lty = 2) +
+  ylab("\u03B2 (95% CI)") +
+  theme_bw() +
+  scale_color_manual(
+    values = c("0" = "cornflowerblue", "1" = "midnightblue"),
+    breaks = c("0", "1"),
+    labels = c("Low Anxiety Symptoms", "High Anxiety Symptoms")
+  ) +
+  coord_flip() +
+  facet_wrap(~type) +
+  theme(
+    title = element_text(size = 16, face = "bold", color = "black"),
+    axis.title.x = element_text(size = 12, face = "bold", color = "black"),
+    axis.title.y = element_blank(),
+    axis.text.x = element_text(size = 12, face = "bold", color = "black"),
+    axis.text.y = element_text(size = 12, face = "bold", color = "black"),
+    strip.text = element_text(size = 12, face = "bold", color = "black"),
+    legend.position = "bottom",
+    legend.title = element_blank()
+  ) +
+  scale_x_discrete(limits = rev(levels(combined_stai$phthalate))) +
+  labs(color = "STAI\nScore") +
+  guides(color = guide_legend(nrow = 2)) 
+
+print(stai_forestplot)
+
+```
+
+## Figure 3
+Associations between an interquartile range increase in natural log transformed average urinary phthalate exposures (ng/mL) and infant attention and arousal scores among a subset of the African American Maternal-Child Cohort, 2016–2020, stratified by averaged depression levels (N = 51 for low depression symptoms, N = 30 for high depression symptoms). Note: Models are adjusted for creatinine, infant sex, infant age at assessment, maternal age, maternal education level, and early pregnancy body mass index. High depression symptoms were defined as an EPDS score> 10
+```{r}
+lowepds.ar.plot <- function(dt){
+  
+  MEPar<-lm(arousal_index_PCA_score ~ MEP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==0)
+  MEPar.output<-cbind(round(MEPar$coefficients,2)[2], round(confint(MEPar),2)[2],round(confint(MEPar),2)[2,2])
+  
+  MBPar<-lm(arousal_index_PCA_score ~ MBP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==0)
+  MBPar.output<-cbind(round(MBPar$coefficients,2)[2], round(confint(MBPar),2)[2],round(confint(MBPar),2)[2,2])
+  
+  MBzPar<-lm(arousal_index_PCA_score~MBzP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==0)
+  MBzPar.output<-cbind(round(MBzPar$coefficients,2)[2], round(confint(MBzPar),2)[2],round(confint(MBzPar),2)[2,2])
+  
+  MEHPar<-lm(arousal_index_PCA_score~MEHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==0)
+  MEHPar.output<-cbind(round(MEHPar$coefficients,2)[2], round(confint(MEHPar),2)[2],round(confint(MEHPar),2)[2,2])
+  
+  MEOHPar<-lm(arousal_index_PCA_score~MEOHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==0)
+  MEOHPar.output<-cbind(round(MEOHPar$coefficients,2)[2], round(confint(MEOHPar),2)[2],round(confint(MEOHPar),2)[2,2])
+  
+  MEHHPar<-lm(arousal_index_PCA_score~MEHHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==0)
+  MEHHPar.output<-cbind(round(MEHHPar$coefficients,2)[2], round(confint(MEHHPar),2)[2],round(confint(MEHHPar),2)[2,2])
+  
+  MECPPar<-lm(arousal_index_PCA_score~MECPP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==0)
+  MECPPar.output<-cbind(round(MECPPar$coefficients,2)[2], round(confint(MECPPar),2)[2],round(confint(MECPPar),2)[2,2])
+  
+  MiBPar<-lm(arousal_index_PCA_score~MiBP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==0)
+  MiBPar.output<-cbind(round(MiBPar$coefficients,2)[2], round(confint(MiBPar),2)[2],round(confint(MiBPar),2)[2,2])
+  
+  DEHPar<-lm(arousal_index_PCA_score~DEHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==0)
+  DEHPar.output<-cbind(round(DEHPar$coefficients,2)[2], round(confint(DEHPar),2)[2],round(confint(DEHPar),2)[2,2])
+  
+  adj.models<-rbind(MEPar.output,
+                    MBPar.output,
+                    MBzPar.output,
+                    MEHPar.output,
+                    MEOHPar.output,
+                    MEHHPar.output,
+                    MECPPar.output,
+                    MiBPar.output,
+                    DEHPar.output)
+  
+  rownames(adj.models)<-c("MEP", "MBP", "MBzP", "MEHP","MEOHP", "MEHHP", "MECPP", "MiBP", "DEHP")
+  colnames(adj.models)<-c("beta","ll", "ul")
+  #View(adj.models)
+  clipr::write_clip(adj.models)
+}
+
+highepds.ar.plot <- function(dt){
+  
+  MEPar<-lm(arousal_index_PCA_score~ MEP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==1)
+  MEPar.output<-cbind(round(MEPar$coefficients,2)[2], round(confint(MEPar),2)[2],round(confint(MEPar),2)[2,2])
+  
+  MBPar<-lm(arousal_index_PCA_score~MBP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==1)
+  MBPar.output<-cbind(round(MBPar$coefficients,2)[2], round(confint(MBPar),2)[2],round(confint(MBPar),2)[2,2])
+  
+  MBzPar<-lm(arousal_index_PCA_score~MBzP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==1)
+  MBzPar.output<-cbind(round(MBzPar$coefficients,2)[2], round(confint(MBzPar),2)[2],round(confint(MBzPar),2)[2,2])
+  
+  MEHPar<-lm(arousal_index_PCA_score~MEHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==1)
+  MEHPar.output<-cbind(round(MEHPar$coefficients,2)[2], round(confint(MEHPar),2)[2],round(confint(MEHPar),2)[2,2])
+  
+  MEOHPar<-lm(arousal_index_PCA_score~MEOHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==1)
+  MEOHPar.output<-cbind(round(MEOHPar$coefficients,2)[2], round(confint(MEOHPar),2)[2],round(confint(MEOHPar),2)[2,2])
+  
+  MEHHPar<-lm(arousal_index_PCA_score~MEHHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==1)
+  MEHHPar.output<-cbind(round(MEHHPar$coefficients,2)[2], round(confint(MEHHPar),2)[2],round(confint(MEHHPar),2)[2,2])
+  
+  MECPPar<-lm(arousal_index_PCA_score~MECPP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==1)
+  MECPPar.output<-cbind(round(MECPPar$coefficients,2)[2], round(confint(MECPPar),2)[2],round(confint(MECPPar),2)[2,2])
+  
+  MiBPar<-lm(arousal_index_PCA_score~MiBP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==1)
+  MiBPar.output<-cbind(round(MiBPar$coefficients,2)[2], round(confint(MiBPar),2)[2],round(confint(MiBPar),2)[2,2])
+  
+  DEHPar<-lm(arousal_index_PCA_score~DEHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==1)
+  DEHPar.output<-cbind(round(DEHPar$coefficients,2)[2], round(confint(DEHPar),2)[2],round(confint(DEHPar),2)[2,2])
+  
+  adj.models<-rbind(MEPar.output,
+                    MBPar.output,
+                    MBzPar.output,
+                    MEHPar.output,
+                    MEOHPar.output,
+                    MEHHPar.output,
+                    MECPPar.output,
+                    MiBPar.output,
+                    DEHPar.output)
+  
+  rownames(adj.models)<-c("MEP", "MBP", "MBzP", "MEHP","MEOHP", "MEHHP", "MECPP", "MiBP", "DEHP")
+  colnames(adj.models)<-c("beta","ll", "ul")
+  #View(adj.models)
+  clipr::write_clip(adj.models)
+}
+
+lowepds.ar.forest <- lowepds.ar.plot(dt=CompleteData)
+highepds.ar.forest <- highepds.ar.plot(dt=CompleteData)
+lowepds.ar.forest <- as.data.frame(lowepds.ar.forest)
+highepds.ar.forest <- as.data.frame(highepds.ar.forest)
+lowepds.ar.forest$epdsscore <- 0
+highepds.ar.forest$epdsscore <- 1
+lowepds.ar.forest$phthalate <- factor(rownames(lowepds.ar.forest), levels = desired_levels, ordered = TRUE)
+highepds.ar.forest$phthalate <- factor(rownames(highepds.ar.forest), levels = desired_levels, ordered = TRUE)
+
+## Attention Stratified on Depression
+lowepds.at.plot <- function(dt){
+  
+  MEPat<-lm(attention_index_PCA_score ~ MEP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==0)
+  MEPat.output<-cbind(round(MEPat$coefficients,2)[2], round(confint(MEPat),2)[2],round(confint(MEPat),2)[2,2])
+  
+  MBPat<-lm(attention_index_PCA_score ~ MBP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==0)
+  MBPat.output<-cbind(round(MBPat$coefficients,2)[2], round(confint(MBPat),2)[2],round(confint(MBPat),2)[2,2])
+  
+  MBzPat<-lm(attention_index_PCA_score~MBzP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==0)
+  MBzPat.output<-cbind(round(MBzPat$coefficients,2)[2], round(confint(MBzPat),2)[2],round(confint(MBzPat),2)[2,2])
+  
+  MEHPat<-lm(attention_index_PCA_score~MEHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==0)
+  MEHPat.output<-cbind(round(MEHPat$coefficients,2)[2], round(confint(MEHPat),2)[2],round(confint(MEHPat),2)[2,2])
+  
+  MEOHPat<-lm(attention_index_PCA_score~MEOHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==0)
+  MEOHPat.output<-cbind(round(MEOHPat$coefficients,2)[2], round(confint(MEOHPat),2)[2],round(confint(MEOHPat),2)[2,2])
+  
+  MEHHPat<-lm(attention_index_PCA_score~MEHHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==0)
+  MEHHPat.output<-cbind(round(MEHHPat$coefficients,2)[2], round(confint(MEHHPat),2)[2],round(confint(MEHHPat),2)[2,2])
+  
+  MECPPat<-lm(attention_index_PCA_score~MECPP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==0)
+  MECPPat.output<-cbind(round(MECPPat$coefficients,2)[2], round(confint(MECPPat),2)[2],round(confint(MECPPat),2)[2,2])
+  
+  MiBPat<-lm(attention_index_PCA_score~MiBP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==0)
+  MiBPat.output<-cbind(round(MiBPat$coefficients,2)[2], round(confint(MiBPat),2)[2],round(confint(MiBPat),2)[2,2])
+  
+  DEHPat<-lm(attention_index_PCA_score~DEHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==0)
+  DEHPat.output<-cbind(round(DEHPat$coefficients,2)[2], round(confint(DEHPat),2)[2],round(confint(DEHPat),2)[2,2])
+  
+  
+  adj.models<-rbind(MEPat.output,
+                    MBPat.output,
+                    MBzPat.output,
+                    MEHPat.output,
+                    MEOHPat.output,
+                    MEHHPat.output,
+                    MECPPat.output,
+                    MiBPat.output,
+                    DEHPat.output)
+  
+  rownames(adj.models)<-c("MEP", "MBP", "MBzP", "MEHP","MEOHP", "MEHHP", "MECPP", "MiBP", "DEHP")
+  colnames(adj.models)<-c("beta","ll", "ul")
+  clipr::write_clip(adj.models)
+}
+
+highepds.at.plot <- function(dt){
+  
+  MEPat<-lm(attention_index_PCA_score~ MEP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==1)
+  MEPat.output<-cbind(round(MEPat$coefficients,2)[2], round(confint(MEPat),2)[2],round(confint(MEPat),2)[2,2])
+  
+  MBPat<-lm(attention_index_PCA_score~MBP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==1)
+  MBPat.output<-cbind(round(MBPat$coefficients,2)[2], round(confint(MBPat),2)[2],round(confint(MBPat),2)[2,2])
+  
+  MBzPat<-lm(attention_index_PCA_score~MBzP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==1)
+  MBzPat.output<-cbind(round(MBzPat$coefficients,2)[2], round(confint(MBzPat),2)[2],round(confint(MBzPat),2)[2,2])
+  
+  MEHPat<-lm(attention_index_PCA_score~MEHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==1)
+  MEHPat.output<-cbind(round(MEHPat$coefficients,2)[2], round(confint(MEHPat),2)[2],round(confint(MEHPat),2)[2,2])
+  
+  MEOHPat<-lm(attention_index_PCA_score~MEOHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==1)
+  MEOHPat.output<-cbind(round(MEOHPat$coefficients,2)[2], round(confint(MEOHPat),2)[2],round(confint(MEOHPat),2)[2,2])
+  
+  MEHHPat<-lm(attention_index_PCA_score~MEHHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==1)
+  MEHHPat.output<-cbind(round(MEHHPat$coefficients,2)[2], round(confint(MEHHPat),2)[2],round(confint(MEHHPat),2)[2,2])
+  
+  MECPPat<-lm(attention_index_PCA_score~MECPP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==1)
+  MECPPat.output<-cbind(round(MECPPat$coefficients,2)[2], round(confint(MECPPat),2)[2],round(confint(MECPPat),2)[2,2])
+  
+  MiBPat<-lm(attention_index_PCA_score~MiBP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==1)
+  MiBPat.output<-cbind(round(MiBPat$coefficients,2)[2], round(confint(MiBPat),2)[2],round(confint(MiBPat),2)[2,2])
+  
+  DEHPat<-lm(attention_index_PCA_score~DEHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt, subset = CompleteData$epds_cat==1)
+  DEHPat.output<-cbind(round(DEHPat$coefficients,2)[2], round(confint(DEHPat),2)[2],round(confint(DEHPat),2)[2,2])
+  
+  adj.models<-rbind(MEPat.output,
+                    MBPat.output,
+                    MBzPat.output,
+                    MEHPat.output,
+                    MEOHPat.output,
+                    MEHHPat.output,
+                    MECPPat.output,
+                    MiBPat.output,
+                    DEHPat.output)
+  
+  rownames(adj.models)<-c("MEP", "MBP", "MBzP", "MEHP","MEOHP", "MEHHP", "MECPP", "MiBP", "DEHP")
+  colnames(adj.models)<-c("beta","ll", "ul")
+  #View(adj.models)
+  clipr::write_clip(adj.models)
+}
+
+lowepds.at.forest <- lowepds.at.plot(dt=CompleteData)
+highepds.at.forest <- highepds.at.plot(dt=CompleteData)
+lowepds.at.forest <- as.data.frame(lowepds.at.forest)
+highepds.at.forest <- as.data.frame(highepds.at.forest)
+lowepds.at.forest$epdsscore <- 0
+highepds.at.forest$epdsscore <- 1
+lowepds.at.forest$phthalate <- factor(rownames(lowepds.at.forest), levels = desired_levels, ordered = TRUE)
+highepds.at.forest$phthalate <- factor(rownames(highepds.at.forest), levels = desired_levels, ordered = TRUE)
+
+
+#Combine low and high plots
+
+lowepds.ar.forest$type <- "Newborn Arousal"
+highepds.ar.forest$type <- "Newborn Arousal"
+
+lowepds.at.forest$type <- "Newborn Attention"
+highepds.at.forest$type <- "Newborn Attention"
+
+combined_epds <- rbind(lowepds.at.forest, highepds.at.forest, lowepds.ar.forest, highepds.ar.forest)
+combined_epds$epdsscore <- factor(combined_epds$epdsscore, levels = c(0, 1))
+combined_epds$type <- as.factor(combined_epds$type)
+combined_epds$type <- factor(combined_epds$type, levels = c("Newborn Attention", "Newborn Arousal"))
+
+## Graph plots
+epds_forestplot <- ggplot(data = combined_epds, aes(x = phthalate, y = beta, ymin = ll, ymax = ul, color = interaction(epdsscore))) +
+  geom_pointrange(position = position_dodge(width = 0.5)) +
+  geom_hline(yintercept = 0, lty = 2) +
+  ylab("\u03B2 (95% CI)") +
+  theme_bw() +
+  scale_color_manual(
+    values = c("0" = "cornflowerblue", "1" = "midnightblue"),
+    breaks = c("0", "1"),
+    labels = c("Low Depression Symptoms", "High Depression Symptoms")
+  ) +
+  coord_flip() +
+  facet_wrap(~type) +
+  theme(
+    title = element_text(size = 16, face = "bold", color = "black"),
+    axis.title.x = element_text(size = 12, face = "bold", color = "black"),
+    axis.title.y = element_blank(),
+    axis.text.x = element_text(size = 12, face = "bold", color = "black"),
+    axis.text.y = element_text(size = 12, face = "bold", color = "black"),
+    strip.text = element_text(size = 12, face = "bold", color = "black"),
+    legend.position = "bottom",
+    legend.title = element_blank()
+  ) +
+  scale_x_discrete(limits = rev(levels(combined_epds$phthalate))) +
+  labs(color = "EPDS\nScore") +
+  guides(color = guide_legend(nrow = 2)) 
+
+print(epds_forestplot)
+
+
+```
+
+# SUPPLEMENTAL MATERIAL
+
+## Table S1
+Distribution of sociodemographic characteristics, clinical characteristics, and depression and anxiety syptoms among pregnant people and infants in the Atlanta African American Maternal-Child Cohort, 2016 – 2020 (N=547)
+```{r}
+TableOne2 <- CreateTableOne(vars=Covars, data=Data, factorVars= CatVars)
+print(TableOne2)
+summary(TableOne2)
+
+```
+
+## Table S2
+Distributions of averaged urinary phthalate metabolite concentrations across sociodemographic characteristics in the Atlanta African American Maternal-Child Cohort (ng/mL)
+```{r}
+ ########### PHTHALATE GM/SD BY SOCIODEMOGRAPHICS #########
+variables <- c("gm_MEP", "gm_MBP", "gm_MiBP", "gm_MBzP", "gm_MEHP", "gm_MEHHP", "gm_MEOHP", "gm_MECPP", "gm_DEHP")
+
+## Marital Status ##
+CompleteData%>% count(marital)
+lapply(CompleteData[which(CompleteData$marital==0) ,variables], function(x){
+  geometric.mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$marital==0) ,variables], function(x){
+  geoSD(x, na.rm=TRUE)
+})
+
+lapply(CompleteData[which(CompleteData$marital==1) ,variables], function(x){
+  geometric.mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$marital==1) ,variables], function(x){
+  geoSD(x, na.rm=TRUE)
+})
+
+## Maternal Education ##
+CompleteData%>% count(educ_cat)
+lapply(CompleteData[which(CompleteData$educ_cat==0) ,variables], function(x){
+  geometric.mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$educ_cat==0) ,variables], function(x){
+  geoSD(x, na.rm=TRUE)
+})
+
+lapply(CompleteData[which(CompleteData$educ_cat==1) ,variables], function(x){
+  geometric.mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$educ_cat==1) ,variables], function(x){
+  geoSD(x, na.rm=TRUE)
+})
+
+## Income to Poverty Ratio ##
+CompleteData%>% count(income_cat)
+lapply(CompleteData[which(CompleteData$income_cat==0) ,variables], function(x){
+  geometric.mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$income_cat==0) ,variables], function(x){
+  geoSD(x, na.rm=TRUE)
+})
+
+lapply(CompleteData[which(CompleteData$income_cat==1) ,variables], function(x){
+  geometric.mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$income_cat==1) ,variables], function(x){
+  geoSD(x, na.rm=TRUE)
+})
+
+## Tobacco, alcohol, marijuana ##
+CompleteData%>% count(alc.smoke)
+lapply(CompleteData[which(CompleteData$alc.smoke==0) ,variables], function(x){
+  geometric.mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$alc.smoke==0) ,variables], function(x){
+  geoSD(x, na.rm=TRUE)
+})
+
+lapply(CompleteData[which(CompleteData$alc.smoke==1) ,variables], function(x){
+  geometric.mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$alc.smoke==1) ,variables], function(x){
+  geoSD(x, na.rm=TRUE)
+})
+
+
+##Parity ##
+CompleteData%>% count(parity)
+lapply(CompleteData[which(CompleteData$parity==0) ,variables], function(x){
+  geometric.mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$parity==0) ,variables], function(x){
+  geoSD(x, na.rm=TRUE)
+})
+
+lapply(CompleteData[which(CompleteData$parity==1) ,variables], function(x){
+  geometric.mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$parity==1) ,variables], function(x){
+  geoSD(x, na.rm=TRUE)
+})
+
+## Insurance ##
+CompleteData%>% count(insurance)
+lapply(CompleteData[which(CompleteData$insurance==1) ,variables], function(x){
+  geometric.mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$insurance==1) ,variables], function(x){
+  geoSD(x, na.rm=TRUE)
+})
+
+lapply(CompleteData[which(CompleteData$insurance==2) ,variables], function(x){
+  geometric.mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$insurance==2) ,variables], function(x){
+  geoSD(x, na.rm=TRUE)
+})
+
+lapply(CompleteData[which(CompleteData$insurance==3) ,variables], function(x){
+  geometric.mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$insurance==3) ,variables], function(x){
+  geoSD(x, na.rm=TRUE)
+})
+
+## Infant sex ##
+CompleteData%>% count(sex)
+lapply(CompleteData[which(CompleteData$sex==1) ,variables], function(x){
+  geometric.mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$sex==1) ,variables], function(x){
+  geoSD(x, na.rm=TRUE)
+})
+
+lapply(CompleteData[which(CompleteData$sex==2) ,variables], function(x){
+  geometric.mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$sex==2) ,variables], function(x){
+  geoSD(x, na.rm=TRUE)
+})
+
+## Hospital ##
+CompleteData%>% count(Site_Prenatal)
+lapply(CompleteData[which(CompleteData$Site_Prenatal=="Emory") ,variables], function(x){
+  geometric.mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$Site_Prenatal=="Emory") ,variables], function(x){
+  geoSD(x, na.rm=TRUE)
+})
+
+lapply(CompleteData[which(CompleteData$Site_Prenatal=="Grady") ,variables], function(x){
+  geometric.mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$Site_Prenatal=="Grady") ,variables], function(x){
+  geoSD(x, na.rm=TRUE)
+})
+
+
+```
+
+## Table S3
+Distributions of newborn attention and arousal across sociodemographic characteristics in the Atlanta African American Maternal-Child Cohort (ng/mL)
+```{r}
+####### NNNS OUTCOME DISTRIBUTION BY SOCIODEMOGRAPHICS ########
+mean(CompleteData$attention_index_PCA_score,na.rm=TRUE)
+sd(CompleteData$attention_index_PCA_score, na.rm=TRUE)
+
+mean(CompleteData$arousal_index_PCA_score,na.rm=TRUE)
+sd(CompleteData$arousal_index_PCA_score, na.rm=TRUE)
+
+variables <- c("attention_index_PCA_score", "arousal_index_PCA_score")
+## Marital Status ##
+CompleteData%>% count(marital)
+lapply(CompleteData[which(CompleteData$marital==0) ,variables], function(x){
+  mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$marital==0) ,variables], function(x){
+  sd(x, na.rm=TRUE)
+})
+
+lapply(CompleteData[which(CompleteData$marital==1) ,variables], function(x){
+  mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$marital==1) ,variables], function(x){
+  sd(x, na.rm=TRUE)
+})
+## Maternal Education ##
+CompleteData%>% count(educ_cat)
+lapply(CompleteData[which(CompleteData$educ_cat==0) ,variables], function(x){
+  mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$educ_cat==0) ,variables], function(x){
+  sd(x, na.rm=TRUE)
+})
+
+lapply(CompleteData[which(CompleteData$educ_cat==1) ,variables], function(x){
+  mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$educ_cat==1) ,variables], function(x){
+  sd(x, na.rm=TRUE)
+})
+
+## Income to Poverty Ratio ##
+CompleteData%>% count(income_cat)
+lapply(CompleteData[which(CompleteData$income_cat==0) ,variables], function(x){
+  mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$income_cat==0) ,variables], function(x){
+  sd(x, na.rm=TRUE)
+})
+
+lapply(CompleteData[which(CompleteData$income_cat==1) ,variables], function(x){
+  mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$income_cat==1) ,variables], function(x){
+  sd(x, na.rm=TRUE)
+})
+
+## Tobacco, alcohol, marijuana ##
+CompleteData%>% count(alc.smoke)
+lapply(CompleteData[which(CompleteData$alc.smoke==0) ,variables], function(x){
+  mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$alc.smoke==0) ,variables], function(x){
+  sd(x, na.rm=TRUE)
+})
+
+lapply(CompleteData[which(CompleteData$alc.smoke==1) ,variables], function(x){
+  mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$alc.smoke==1) ,variables], function(x){
+  sd(x, na.rm=TRUE)
+})
+
+
+## Parity ##
+CompleteData%>% count(parity)
+lapply(CompleteData[which(CompleteData$parity==0) ,variables], function(x){
+  mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$parity==0) ,variables], function(x){
+  sd(x, na.rm=TRUE)
+})
+
+lapply(CompleteData[which(CompleteData$parity==1) ,variables], function(x){
+  mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$parity==1) ,variables], function(x){
+  sd(x, na.rm=TRUE)
+})
+
+## Insurance ##
+CompleteData%>% count(insurance)
+lapply(CompleteData[which(CompleteData$insurance==1) ,variables], function(x){
+  mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$insurance==1) ,variables], function(x){
+  sd(x, na.rm=TRUE)
+})
+
+lapply(CompleteData[which(CompleteData$insurance==2) ,variables], function(x){
+  mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$insurance==2) ,variables], function(x){
+  sd(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$insurance==3) ,variables], function(x){
+  mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$insurance==3) ,variables], function(x){
+  sd(x, na.rm=TRUE)
+})
+
+## Infant sex ##
+CompleteData%>% count(sex)
+lapply(CompleteData[which(CompleteData$sex==1) ,variables], function(x){
+  mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$sex==1) ,variables], function(x){
+  sd(x, na.rm=TRUE)
+})
+
+lapply(CompleteData[which(CompleteData$sex==2) ,variables], function(x){
+  mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$sex==2) ,variables], function(x){
+  sd(x, na.rm=TRUE)
+})
+
+## Hospital ##
+CompleteData%>% count(Site_Prenatal)
+lapply(CompleteData[which(CompleteData$Site_Prenatal=="Emory") ,variables], function(x){
+  mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$Site_Prenatal=="Emory") ,variables], function(x){
+  sd(x, na.rm=TRUE)
+})
+
+lapply(CompleteData[which(CompleteData$Site_Prenatal=="Grady") ,variables], function(x){
+  mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$Site_Prenatal=="Grady") ,variables], function(x){
+  sd(x, na.rm=TRUE)
+})
+
+ ## Anxiety ##
+CompleteData%>% count(stai_cat)
+lapply(CompleteData[which(CompleteData$stai_cat==0) ,variables], function(x){
+  mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$stai_cat== 0) ,variables], function(x){
+  sd(x, na.rm=TRUE)
+})
+
+lapply(CompleteData[which(CompleteData$stai_cat==1) ,variables], function(x){
+  mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$stai_cat==1) ,variables], function(x){
+  sd(x, na.rm=TRUE)
+})
+
+## Depression ##
+CompleteData%>% count(epds_cat)
+lapply(CompleteData[which(CompleteData$epds_cat==0) ,variables], function(x){
+  mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$epds_cat==0) ,variables], function(x){
+  sd(x, na.rm=TRUE)
+})
+
+lapply(CompleteData[which(CompleteData$epds_cat==1) ,variables], function(x){
+  mean(x, na.rm=TRUE)
+})
+lapply(CompleteData[which(CompleteData$epds_cat==1) ,variables], function(x){
+  sd(x, na.rm=TRUE)
+})
+
+```
+
+## Table S4
+Minimally adjusted and adjusted linear regression coefficients and 95% confidence intervals for newborn attention and arousal with an interquartile range increase in averaged urinary phthalate metabolite concentrations
+
+```{r}
+#### MINIMALLY ADJUSTED LINEAR REGRESSION MODEL -- adjsuted for infant sex, infant age at assessment, and creatnine ####
+CrudePhthalate.lm<- function(dt, 
+                             attentionz,
+                             arousalz){
+  
+  if (attentionz==TRUE){outcome<-dt$attention_index_PCA_score}
+  if (arousalz==TRUE){outcome<-dt$arousal_index_PCA_score}
+
+  
+  MEP<-lm(outcome~ MEP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk, data=dt)
+  MEP.output<-cbind(nobs(MEP)[1],
+                    paste0(round(MEP$coefficients,2)[2]," (",round(confint(MEP),2)[2,2],", ",round(confint(MEP),2)[2],")"))
+  
+  MBP<-lm(outcome~MBP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk, data=dt)
+  MBP.output<-cbind(nobs(MBP)[1],
+                    paste0(round(MBP$coefficients,2)[2]," (",round(confint(MBP),2)[2,2],", ",round(confint(MBP),2)[2],")"))
+  
+  MBzP<-lm(outcome~MBzP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk, data=dt)
+  MBzP.output<-cbind(nobs(MBzP)[1],
+                     paste0(round(MBzP$coefficients,2)[2]," (",round(confint(MBzP),2)[2,2],", ",round(confint(MBzP),2)[2],")"))
+  
+  MEHP<-lm(outcome~MEHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk, data=dt)
+  MEHP.output<-cbind(nobs(MEHP)[1],
+                     paste0(round(MEHP$coefficients,2)[2]," (",round(confint(MEHP),2)[2,2],", ",round(confint(MEHP),2)[2],")"))
+  
+  MEOHP<-lm(outcome~MEOHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk, data=dt)
+  MEOHP.output<-cbind(nobs(MEOHP)[1],
+                      paste0(round(MEOHP$coefficients,2)[2]," (",round(confint(MEOHP),2)[2,2],", ",round(confint(MEOHP),2)[2],")"))
+  
+  MEHHP<-lm(outcome~MEHHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk, data=dt)
+  MEHHP.output<-cbind(nobs(MEHHP)[1],
+                      paste0(round(MEHHP$coefficients,2)[2]," (",round(confint(MEHHP),2)[2,2],", ",round(confint(MEHHP),2)[2],")"))
+  
+  MECPP<-lm(outcome~MECPP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk, data=dt)
+  MECPP.output<-cbind(nobs(MECPP)[1],
+                      paste0(round(MECPP$coefficients,2)[2]," (",round(confint(MECPP),2)[2,2],", ",round(confint(MECPP),2)[2],")"))
+  
+  
+  MiBP<-lm(outcome~MiBP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk, data=dt)
+  MiBP.output<-cbind(nobs(MiBP)[1],
+                     paste0(round(MiBP$coefficients,2)[2]," (",round(confint(MiBP),2)[2,2],", ",round(confint(MiBP),2)[2],")"))
+  
+  DEHP<-lm(outcome~DEHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk, data=dt)
+  DEHP.output<-cbind(nobs(DEHP)[1],
+                     paste0(round(DEHP$coefficients,2)[2]," (",round(confint(DEHP),2)[2,2],", ",round(confint(DEHP),2)[2],")"))
+
+  crude.models<-rbind(MEP.output,
+                      MBP.output,
+                      MBzP.output,
+                      MEHP.output,
+                      MEOHP.output,
+                      MEHHP.output,
+                      MECPP.output,
+                      MiBP.output,
+                      DEHP.output)
+  
+  rownames(crude.models)<-c("MEP", "MBP", "MBzP", "MEHP", "MEOHP", "MEHHP", "MECPP", "MiBP", "DEHP") 
+  colnames(crude.models)<-c("N","Beta (95% CI [ul, ll])")
+  View(crude.models)
+  clipr::write_clip(crude.models)
+  
+}
+
+
+
+#Attention 
+CrudePhthalate.lm(dt=CompleteData, 
+                  attentionz=TRUE,
+                  arousalz=FALSE) 
+
+#Arousal
+CrudePhthalate.lm(dt=CompleteData, 
+                  attentionz=FALSE,
+                  arousalz=TRUE) 
+
+#### ADJUSTED LINEAR REGRESSION MODEL ####
+AdjustedPhthalate.lm<- function(dt, 
+                               attentionz,
+                               arousalz){
+  
+  if (attentionz==TRUE){outcome<-dt$attention_index_PCA_score}
+  if (arousalz==TRUE){outcome<-dt$arousal_index_PCA_score}
+  
+  
+  MEP<-lm(outcome~ MEP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi, data=dt)
+  MEP.output<-cbind(nobs(MEP)[1],
+                    paste0(round(MEP$coefficients,2)[2]," (",round(confint(MEP),2)[2],", ",round(confint(MEP),2)[2,2],")"))
+  
+  MBP<-lm(outcome~MBP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk +  mat_age + as.factor(mat_educ) + ppbmi, data=dt)
+  MBP.output<-cbind(nobs(MBP)[1],
+                    paste0(round(MBP$coefficients,2)[2]," (",round(confint(MBP),2)[2],", ",round(confint(MBP),2)[2,2],")"))
+  
+  MBzP<-lm(outcome~MBzP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk +  mat_age + as.factor(mat_educ) + ppbmi, data=dt)
+  MBzP.output<-cbind(nobs(MBzP)[1],
+                     paste0(round(MBzP$coefficients,2)[2]," (",round(confint(MBzP),2)[2],", ",round(confint(MBzP),2)[2,2],")"))
+  
+  MEHP<-lm(outcome~MEHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk +  mat_age + as.factor(mat_educ) + ppbmi, data=dt)
+  MEHP.output<-cbind(nobs(MEHP)[1],
+                     paste0(round(MEHP$coefficients,2)[2]," (",round(confint(MEHP),2)[2],", ",round(confint(MEHP),2)[2,2],")"))
+  
+  MEOHP<-lm(outcome~MEOHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk +  mat_age + as.factor(mat_educ) + ppbmi, data=dt)
+  MEOHP.output<-cbind(nobs(MEOHP)[1],
+                      paste0(round(MEOHP$coefficients,2)[2]," (",round(confint(MEOHP),2)[2],", ",round(confint(MEOHP),2)[2,2],")"))
+  
+  MEHHP<-lm(outcome~MEHHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk +  mat_age + as.factor(mat_educ) + ppbmi, data=dt)
+  MEHHP.output<-cbind(nobs(MEHHP)[1],
+                      paste0(round(MEHHP$coefficients,2)[2]," (",round(confint(MEHHP),2)[2],", ",round(confint(MEHHP),2)[2,2],")"))
+  
+  MECPP<-lm(outcome~MECPP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk +  mat_age + as.factor(mat_educ) + ppbmi, data=dt)
+  MECPP.output<-cbind(nobs(MECPP)[1],
+                      paste0(round(MECPP$coefficients,2)[2]," (",round(confint(MECPP),2)[2],", ",round(confint(MECPP),2)[2,2],")"))
+  
+  
+  MiBP<-lm(outcome~MiBP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk +  mat_age + as.factor(mat_educ) + ppbmi, data=dt)
+  MiBP.output<-cbind(nobs(MiBP)[1],
+                     paste0(round(MiBP$coefficients,2)[2]," (",round(confint(MiBP),2)[2],", ",round(confint(MiBP),2)[2,2],")"))
+ 
+  DEHP<-lm(outcome~DEHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk +  mat_age + as.factor(mat_educ) + ppbmi, data=dt)
+  DEHP.output<-cbind(nobs(DEHP)[1],
+                     paste0(round(DEHP$coefficients,2)[2]," (",round(confint(DEHP),2)[2],", ",round(confint(DEHP),2)[2,2],")"))
+  
+  
+  crude.models<-rbind(MEP.output,
+                      MBP.output,
+                      MBzP.output,
+                      MEHP.output,
+                      MEOHP.output,
+                      MEHHP.output,
+                      MECPP.output,
+                      MiBP.output,
+                      DEHP.output)
+  
+  rownames(crude.models)<-c("MEP", "MBP", "MBzP", "MEHP", "MEOHP", "MEHHP", "MECPP", "MiBP", "DEHP") 
+  colnames(crude.models)<-c("N","Beta (95% CI)")
+  View(crude.models)
+  clipr::write_clip(crude.models)
+  
+}
+# Attention 
+AdjustedPhthalate.lm(dt=CompleteData, 
+                    attentionz=TRUE,
+                    arousalz=FALSE) 
+
+# Arousal
+AdjustedPhthalate.lm(dt=CompleteData, 
+                    attentionz=FALSE,
+                    arousalz=TRUE) 
+
+
+```
+
+## Table S5
+Adjusted linear regression coefficients and 95% confidence intervals for newborn attention and arousal with an interquartile range increase in averaged urinary phthalate metabolite concentrations, stratified by average anxiety
+```{r}
+#Arousal for low anxiety (avg)
+AdjustedPhthalate.lm(dt=CompleteData[which(CompleteData$stai_cat==0),],
+                     attentionz=FALSE,
+                     arousalz=TRUE) 
+#Arousal for high anxiety (avg)
+AdjustedPhthalate.lm(dt=CompleteData[which(CompleteData$stai_cat==1),],
+                     attentionz=FALSE,
+                     arousalz=TRUE) 
+
+#Attention for high anxiety (average)
+AdjustedPhthalate.lm(dt=CompleteData[which(CompleteData$stai_cat==1),],
+                     attentionz=TRUE,
+                     arousalz=FALSE) 
+#Attention for low anxiety (average)
+AdjustedPhthalate.lm(dt=CompleteData[which(CompleteData$stai_cat==0),],
+                     attentionz=TRUE,
+                     arousalz=FALSE) 
+
+
+
+
+
+```
+
+## Table S6
+```{r}
+#Attention for high depression (avg)
+AdjustedPhthalate.lm(dt=CompleteData[which(CompleteData$epds_cat==1),], 
+                     attentionz=TRUE,
+                     arousalz=FALSE) 
+#Arousal for high depression (avg)
+AdjustedPhthalate.lm(dt=CompleteData[which(CompleteData$epds_cat==1),], 
+                     attentionz=FALSE,
+                     arousalz=TRUE) 
+#Attention for low depression (avg)
+AdjustedPhthalate.lm(dt=CompleteData[which(CompleteData$epds_cat==0),], 
+                     attentionz=TRUE,
+                     arousalz=FALSE) 
+#Arousal for low depression (avg)
+AdjustedPhthalate.lm(dt=CompleteData[which(CompleteData$epds_cat==0),], 
+                     attentionz=FALSE,
+                     arousalz=TRUE) 
+
+
+
+####### CACLCUATE P-VALUE FOR INTERACTION FOR TABLE S5 AND S6 ##########
+
+### MEP ###
+AtMEPepds.lm <- lm(attention_index_PCA_score~ MEP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                     epds + MEP.iqr*epds, data=CompleteData)
+summary(AtMEPepds.lm)
+#confint(AtMEPepds.lm)
+ArMEPepds.lm <- lm(arousal_index_PCA_score~ MEP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                     epds + MEP.iqr*epds, data=CompleteData)
+summary(ArMEPepds.lm)
+#confint(ArMEPepds.lm)
+
+AtMEPstai.lm <- lm(attention_index_PCA_score~ MEP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                     stai + MEP.iqr*stai, data=CompleteData)
+summary(AtMEPstai.lm)
+#confint(AtMEPstai.lm)
+ArMEPstai.lm <- lm(arousal_index_PCA_score~ MEP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                     stai + MEP.iqr*stai, data=CompleteData)
+summary(ArMEPstai.lm)
+#confint(ArMEPstai.lm)
+
+### MBP ###
+AtMBPepds.lm <- lm(attention_index_PCA_score~ MBP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                     epds + MBP.iqr*epds, data=CompleteData)
+summary(AtMBPepds.lm)
+#confint(AtMBPepds.lm)
+ArMBPepds.lm <- lm(arousal_index_PCA_score~ MBP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                     epds + MBP.iqr*epds, data=CompleteData)
+summary(ArMBPepds.lm)
+#confint(ArMBPepds.lm)
+
+AtMBPstai.lm <- lm(attention_index_PCA_score~ MBP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                     stai + MBP.iqr*stai , data=CompleteData)
+summary(AtMBPstai.lm)
+#confint(AtMBPstai.lm)
+ArMBPstai.lm <- lm(arousal_index_PCA_score~ MBP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                     stai + MBP.iqr*stai, data=CompleteData)
+summary(ArMBPstai.lm)
+#confint(ArMBPstai.lm)
+
+### MiBP ###
+AtMiBPepds.lm <- lm(attention_index_PCA_score~ MBP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                     epds + MiBP.iqr*epds, data=CompleteData)
+summary(AtMiBPepds.lm)
+#confint(AtMiBPepds.lm)
+ArMiBPepds.lm <- lm(arousal_index_PCA_score~ MBP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                     epds + MiBP.iqr*epds, data=CompleteData)
+summary(ArMiBPepds.lm)
+#confint(ArMiBPepds.lm)
+
+AtMiBPstai.lm <- lm(attention_index_PCA_score~ MiBP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                      stai + MiBP.iqr*stai, data=CompleteData)
+summary(AtMiBPstai.lm)
+#confint(AtMiBPstai.lm)
+ArMiBPstai.lm <- lm(arousal_index_PCA_score~ MBP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                      stai + MiBP.iqr*stai, data=CompleteData)
+summary(ArMiBPstai.lm)
+#confint(ArMiBPstai.lm)
+
+### MBzP ###
+AtMBzPepds.lm <- lm(attention_index_PCA_score~ MBzP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                      epds + MBzP.iqr*epds, data=CompleteData)
+summary(AtMBzPepds.lm)
+#confint(AtMBzPepds.lm)
+ArMBzPepds.lm <- lm(arousal_index_PCA_score~ MBzP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                      epds + MBzP.iqr*epds, data=CompleteData)
+summary(ArMBzPepds.lm)
+#confint(ArMBzPepds.lm)
+
+AtMBzPstai.lm <- lm(attention_index_PCA_score~ MBzP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                      stai + MBzP.iqr*stai, data=CompleteData)
+summary(AtMBzPstai.lm)
+#confint(AtMBzPstai.lm)
+ArMBzPstai.lm <- lm(arousal_index_PCA_score~ MBzP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                      stai + MBzP.iqr*stai, data=CompleteData)
+summary(ArMBzPstai.lm)
+# confint(ArMBzPstai.lm)
+
+### MEHP ###
+AtMEHPepds.lm <- lm(attention_index_PCA_score~ MEHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                      epds + MEHP.iqr*epds, data=CompleteData)
+summary(AtMEHPepds.lm)
+#confint(AtMEHPepds.lm)
+ArMEHPepds.lm <- lm(arousal_index_PCA_score~ MEHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                      epds + MEHP.iqr*epds, data=CompleteData)
+summary(ArMEHPepds.lm)
+#confint(ArMEHPepds.lm)
+
+AtMEHPstai.lm <- lm(attention_index_PCA_score~ MEHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                      stai + MEHP.iqr*stai, data=CompleteData)
+summary(AtMEHPstai.lm)
+#confint(AtMEHPstai.lm)
+ArMEHPstai.lm <- lm(arousal_index_PCA_score~ MEHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                      stai + MEHP.iqr*stai, data=CompleteData)
+summary(ArMEHPstai.lm)
+#confint(ArMEHPstai.lm)
+
+### MEHHP ###
+AtMEHHPepds.lm <- lm(attention_index_PCA_score~ MEHHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                      epds + MEHHP.iqr*epds, data=CompleteData)
+summary(AtMEHHPepds.lm)
+#confint(AtMEHHPepds.lm)
+ArMEHHPepds.lm <- lm(arousal_index_PCA_score~ MEHHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                      epds + MEHHP.iqr*epds, data=CompleteData)
+summary(ArMEHHPepds.lm)
+#confint(ArMEHHPepds.lm)
+
+AtMEHHPstai.lm <- lm(attention_index_PCA_score~ MEHHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                       stai + MEHHP.iqr*stai, data=CompleteData)
+summary(AtMEHHPstai.lm)
+#confint(AtMEHHPstai.lm)
+ArMEHHPstai.lm <- lm(arousal_index_PCA_score~ MEHHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                       stai + MEHHP.iqr*stai, data=CompleteData)
+summary(ArMEHHPstai.lm)
+#confint(ArMEHHPstai.lm)
+
+### MEOHP ###
+AtMEOHPepds.lm <- lm(attention_index_PCA_score~ MEOHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                       epds + MEOHP.iqr*epds, data=CompleteData)
+summary(AtMEOHPepds.lm)
+#confint(AtMEOHPepds.lm)
+ArMEOHPepds.lm <- lm(arousal_index_PCA_score~ MEOHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                       epds + MEOHP.iqr*epds, data=CompleteData)
+summary(ArMEOHPepds.lm)
+#confint(ArMEOHPepds.lm)
+
+AtMEOHPstai.lm <- lm(attention_index_PCA_score~ MEOHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                       stai + MEOHP.iqr*stai, data=CompleteData)
+summary(AtMEOHPstai.lm)
+#confint(AtMEOHPstai.lm)
+ArMEOHPstai.lm <- lm(arousal_index_PCA_score~ MEOHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                       stai + MEOHP.iqr*stai, data=CompleteData)
+summary(ArMEOHPstai.lm)
+#confint(ArMEOHPstai.lm)
+
+### MECPP ###
+AtMECPPepds.lm <- lm(attention_index_PCA_score~ MECPP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                       epds + MECPP.iqr*epds, data=CompleteData)
+summary(AtMECPPepds.lm)
+#confint(AtMECPPepds.lm)
+ArMECPPepds.lm <- lm(arousal_index_PCA_score~ MECPP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                       epds + MECPP.iqr*epds, data=CompleteData)
+summary(ArMECPPepds.lm)
+#confint(ArMECPPepds.lm)
+
+AtMECPPstai.lm <- lm(attention_index_PCA_score~ MECPP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                       stai + MECPP.iqr*stai, data=CompleteData)
+summary(AtMECPPstai.lm)
+#confint(AtMECPPstai.lm)
+ArMECPPstai.lm <- lm(arousal_index_PCA_score~ MECPP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                       stai + MECPP.iqr*stai, data=CompleteData)
+summary(ArMECPPstai.lm)
+#confint(ArMECPPstai.lm)
+
+### DEHP ###
+AtDEHPepds.lm <- lm(attention_index_PCA_score~ DEHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                       epds + DEHP.iqr*epds, data=CompleteData)
+summary(AtDEHPepds.lm)
+#confint(AtDEHPepds.lm)
+ArDEHPepds.lm <- lm(arousal_index_PCA_score~ DEHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                       epds + DEHP.iqr*epds, data=CompleteData)
+summary(ArDEHPepds.lm)
+#confint(ArDEHPepds.lm)
+
+AtDEHPstai.lm <- lm(attention_index_PCA_score~ DEHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                      stai + DEHP.iqr*stai, data=CompleteData)
+summary(AtDEHPstai.lm)
+#confint(AtDEHPstai.lm)
+ArDEHPstai.lm <- lm(arousal_index_PCA_score~ DEHP.iqr + gm_Creat + as.factor(sex) + correctedagedays1wk + mat_age + as.factor(mat_educ) + ppbmi +
+                      stai + DEHP.iqr*stai, data=CompleteData)
+summary(ArDEHPstai.lm)
+#confint(ArDEHPstai.lm)
+
+
+```
+
+## Figure S2
+Spearman correlations between natural log transformed, geometric averaged phthalate exposure concentrations in the Atlanta African American Maternal-Child Cohort (N=81)
+```{r}
+########## CORRELATION MATRIX #############
+
+##Phthalates with each other##
+corr.vars<-c("gm_MEP",
+             "gm_MBP",
+             "gm_MiBP",
+             "gm_MBzP",
+             "gm_MEHP",
+             "gm_MEOHP",
+             "gm_MEHHP",
+             "gm_MECPP",
+             "gm_DEHP"
+           )
+
+df.corr<-as.data.frame(CompleteData)[corr.vars]
+
+df.corr$log.MEP<-log(df.corr$gm_MEP)
+df.corr$log.MBP<-log(df.corr$gm_MBP)
+df.corr$log.MiBP<-log(df.corr$gm_MiBP)
+df.corr$log.MBzP<-log(df.corr$gm_MBzP)
+df.corr$log.MEHP<-log(df.corr$gm_MEHP)
+df.corr$log.MEOHP<-log(df.corr$gm_MEOHP)
+df.corr$log.MEHHP<-log(df.corr$gm_MEHHP)
+df.corr$log.MECPP<-log(df.corr$gm_MECPP)
+df.corr$log.DEHP<-log(df.corr$gm_DEHP)
+
+df.corr<-df.corr[c(10:18)]
+df.corr<-cor(df.corr,method="spearman",use="complete.obs")
+
+colnames(df.corr)<-c( "MEP", "MBP", "MiBP", "MBzP", "MEHP", "MEOHP", "MEHHP", "MECPP", "DEHP")
+rownames(df.corr)<-c( "MEP", "MBP", "MiBP", "MBzP", "MEHP", "MEOHP", "MEHHP", "MECPP", "DEHP")
+corrplot(df.corr,
+         method="square",
+         type = "full",
+         tl.col = "black")
+
+
+```
+
+## Figure S3
+Spearman correlations between natural log transformed, visit specific urinary phthalate exposure concentrations in the Atlanta African American Maternal-Child Cohort (N=81)
+```{r}
+## V1 and V2 phthalates ##
+corr2.vars<-c("MEP_v1",
+             "MBP_v1",
+             "MiBP_v1",
+             "MBzP_v1",
+             "MEHP_v1",
+             "MEOHP_v1",
+             "MEHHP_v1",
+             "MECPP_v1",
+             "DEHP_v1",
+             "MEP_v2",
+             "MBP_v2",
+             "MiBP_v2",
+             "MBzP_v2",
+             "MEHP_v2",
+             "MEOHP_v2",
+             "MEHHP_v2",
+             "MECPP_v2",
+             "DEHP_v2"
+)
+
+df.corr2<-as.data.frame(CompleteData)[corr2.vars]
+
+df.corr2$log.MEPv1<-log(df.corr2$MEP_v1)
+df.corr2$log.MBPv1<-log(df.corr2$MBP_v1)
+df.corr2$log.MiBPv1<-log(df.corr2$MiBP_v1)
+df.corr2$log.MBzPv1<-log(df.corr2$MBzP_v1)
+df.corr2$log.MEHPv1<-log(df.corr2$MEHP_v1)
+df.corr2$log.MEOHPv1<-log(df.corr2$MEOHP_v1)
+df.corr2$log.MEHHPv1<-log(df.corr2$MEHHP_v1)
+df.corr2$log.MECPPv1<-log(df.corr2$MECPP_v1)
+df.corr2$log.DEHPv1<-log(df.corr2$DEHP_v1)
+
+df.corr2$log.MEPv2<-log(df.corr2$MEP_v2)
+df.corr2$log.MBPv2<-log(df.corr2$MBP_v2)
+df.corr2$log.MiBPv2<-log(df.corr2$MiBP_v2)
+df.corr2$log.MBzPv2<-log(df.corr2$MBzP_v2)
+df.corr2$log.MEHPv2<-log(df.corr2$MEHP_v2)
+df.corr2$log.MEOHPv2<-log(df.corr2$MEOHP_v2)
+df.corr2$log.MEHHPv2<-log(df.corr2$MEHHP_v2)
+df.corr2$log.MECPPv2<-log(df.corr2$MECPP_v2)
+df.corr2$log.DEHPv2<-log(df.corr2$DEHP_v2)
+
+df.corr2<-df.corr2[c(19:36)]
+df.corr2<-cor(df.corr2,method="spearman",use="complete.obs")
+
+colnames(df.corr2)<-c("MEP V1", "MBP V1", "MiBP V1", "MBzP V1", "MEHP V1", "MEOHP V1", "MEHHP V1", "MECPP V1", "DEHP V1", "MEP V2", "MBP V2", "MiBP V2", "MBzP V2", "MEHP V2", "MEOHP V2", "MEHHP V2", "MECPP V2", "DEHP V2")
+rownames(df.corr2)<-c("MEP V1", "MBP V1", "MiBP V1", "MBzP V1", "MEHP V1", "MEOHP V1", "MEHHP V1", "MECPP V1", "DEHP V1", "MEP V2", "MBP V2", "MiBP V2", "MBzP V2", "MEHP V2", "MEOHP V2", "MEHHP V2", "MECPP V2", "DEHP V2")
+corrplot(df.corr2,
+         method="square",
+         type = "full",
+         tl.col = "black")
+
+```
+
+## Figure S4
+Spearman correlations between averaged and visit specific anxiety and depression symptom scores as continuous meausres in the Atlanta African American Maternal-Child Cohort (N=81)
+```{r}
+## By visit: anxiety and depression ##
+corr3.vars<-c("stai",
+              "stai_v1",
+             "stai_v2",
+             "epds",
+             "epds_v1",
+             "epds_v2"
+)
+
+df.corr3<-as.data.frame(CompleteData)[corr3.vars]
+
+df.corr3<-df.corr3[c(1:6)]
+df.corr3<-cor(df.corr3,method="spearman",use="complete.obs")
+
+colnames(df.corr3)<-c("Average Anxiety", "Anxiety V1", "Anxiety V2", "Average Depression", "Depression V1", "Depression V2")
+rownames(df.corr3)<-c("Average Anxiety", "Anxiety V1", "Anxiety V2", "Average Depression", "Depression V1", "Depression V2")
+corrplot(df.corr3,
+         method="square",
+         type = "full",
+         tl.col = "black")
+
+
+```
+
