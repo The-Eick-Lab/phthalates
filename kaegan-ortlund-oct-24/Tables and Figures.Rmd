@@ -1,0 +1,707 @@
+---
+title: "Oxidative stress as a potential mechanism linking gestational phthalates exposure to cognitive development in infancy"
+author: "Kaegan Ortlund"
+date: "2024-10-08"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# MAIN TEXT: TABLES AND FIGURES 
+
+## Set Up
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(stringr)
+library(psych)
+library(DT)
+library(data.table)
+library(ggsci)
+library(table1)
+library(lme4)
+library(corrplot)
+library(mediation)
+library(lavaan)
+library(RColorBrewer)
+```
+
+## Table 1: Distribution of demographic characteristics and visual recognition memory outcomes in the Illinois Kids Development Study
+
+```{r}
+# Analytic sample 1 
+table1(~ mat_age + ppbmi + as.factor(mat_educ) + as.factor(mat_race_eth) + as.factor(sex) +
+         as.factor(sex) + as.factor(parity) + as.factor(set) + novelty.pref.faces,
+       data = ph_complete_wide)
+
+# Analytic sample 2 
+table1(~ mat_age + ppbmi + as.factor(mat_educ) + as.factor(mat_race_eth) + as.factor(sex) +
+         as.factor(sex) + as.factor(parity) + as.factor(set) + novelty.pref.faces,
+       data = ph_complete_wide_VRM)
+```
+
+
+## Table 2: Distribution of urinary, specific gravity corrected, phthalate exposure biomarkers at 16–18 weeks gestation, and oxidative stress biomarkers, averaged across 16–18 and 22–24 weeks gestation, in the Illinois Kids Development Study (2014–2016)
+```{r}
+##### Analytic sample 1 
+
+## Create list of phthalate names
+phthalate_names_sum_table <- c(
+  "sum_DINP_PBcorrected",
+  "sum_DEHP_PBcorrected",
+  "sum_AA_PBcorrected",
+  "mep_PBcorrected",
+  "iso_sg_avg",
+  "isom_sg_avg",
+  "isom_new_sg_avg",
+  "pgf_sg_avg")
+
+# Initialize an empty result table
+result_table <- tibble()
+
+
+# Loop through phthalate names
+for (name in phthalate_names_sum_table) {
+  x <- ph_complete_wide[[name]]
+  mean <- round(geometric.mean(x, na.rm = TRUE), 2)
+  sd <- round(exp(sd(log(x), na.rm = TRUE)), 2)
+  quantile_05 <- round(quantile(na.omit(x), 0.05), 2)
+  quantile_25 <- round(quantile(na.omit(x), 0.25), 2)
+  quantile_50 <- round(quantile(na.omit(x), 0.50), 2)
+  quantile_75 <- round(quantile(na.omit(x), 0.75), 2)
+  quantile_95 <- round(quantile(na.omit(x), 0.95), 2)
+  
+  result_data <- tibble(
+    "Phathalate" = name,
+    "Geometric Mean" = mean,
+    "Geometric Standard Deviation" = sd,
+    "5%" = quantile_05,
+    "25%" = quantile_25,
+    "50%" = quantile_50,
+    "75%" = quantile_75,
+    "95%" = quantile_95
+  )
+  
+# Append the results to the table
+  table2_1 <- bind_rows(result_table, result_data) 
+}
+
+table2_1 
+##### Analytic sample 2 
+
+result_table <- tibble()
+
+for (name in phthalate_names_sum_table) {
+  x <- ph_complete_wide_VRM[[name]]
+  mean <- round(geometric.mean(x, na.rm = TRUE), 2)
+  sd <- round(exp(sd(log(x), na.rm = TRUE)), 2)
+  quantile_05 <- round(quantile(na.omit(x), 0.05), 2)
+  quantile_25 <- round(quantile(na.omit(x), 0.25), 2)
+  quantile_50 <- round(quantile(na.omit(x), 0.50), 2)
+  quantile_75 <- round(quantile(na.omit(x), 0.75), 2)
+  quantile_95 <- round(quantile(na.omit(x), 0.95), 2)
+  
+  result_data <- tibble(
+    "Phathalate" = name,
+    "Geometric Mean" = mean,
+    "Geometric Standard Deviation" = sd,
+    "5%" = quantile_05,
+    "25%" = quantile_25,
+    "50%" = quantile_50,
+    "75%" = quantile_75,
+    "95%" = quantile_95
+  )
+  
+# Append the results to the table
+  table2_2 <- bind_rows(result_table, result_data) 
+}
+
+table_2_2
+```
+
+## Figure 2: Correlation Matrix: IKIDS oxidative stress values and phathalate data 
+```{r message = FALSE, warning=FALSE}
+# Subset data
+ph_stress_corr <- ph_complete_wide %>% select(
+  sum_DINP_PBcorrected,
+  sum_DEHP_PBcorrected,
+  sum_AA_PBcorrected,
+  mep_PBcorrected,
+  iso_sg_avg, 
+  isom_sg_avg, 
+  isom_new_sg_avg,
+  pgf_sg_avg,
+  novelty.pref.faces) %>% na.omit()
+
+# Log data 
+ph_stress_corr_log <- log(ph_stress_corr)
+colnames(ph_stress_corr_log) <- c("ΣDINP", "ΣDEHP", "ΣAA", "MEP", "8-iso-PGF2α", "2,3-dinor-5,6-dihydro-8-iso-PGF2α", "2,3-dinor-8-iso-PGF2α", "PGF2α", "Novelty Preference")
+
+# Correlation matrix 
+ph_stress_matrix_log <- cor(ph_stress_corr_log)
+
+# Correlation plot 
+corrplot(ph_stress_matrix_log, method = "color", outline = T, tl.col = "black", addgrid.col = 'white',number.cex = 0.75, title = "Correlation for Oxidative Stress, Phathalates, VRM")
+```
+
+## Figure 3: Associations between natural log transformed, urinary, specific gravity corrected phthalate biomarkers at 16–18 weeks gestation, and oxidative stress biomarkers at 16–18 weeks and 22–24 weeks gestation, estimated using linear mixed effect models in the Illinois Kids Development Study.
+
+
+```{r}
+# Create a list of phthalate names (summed)
+phthalate_names_sum <- c(
+  "sum_DEHP_PBcorrected",
+  "sum_DINP_PBcorrected",
+  "sum_AA_PBcorrected",
+  "mep_PBcorrected"
+)
+
+p_names_sum <- c("ΣDEHP", "ΣDINP", "ΣAA", "MEP")
+
+# Stress names
+stress_names <- c("iso.sg", "isom.sg", "isom.new.sg", "pgf.sg")
+stress_label <- c("8-iso-PGF2α", "2,3-dinor-5,6-dihydro-8-iso-PGF2α", "2,3-dinor-8-iso-PGF2α", "PGF2α ")
+names(stress_label) <- c("iso.sg", "isom.sg", "isom.new.sg", "pgf.sg")
+
+stress_avg_names <- c("iso_sg_avg", "isom_sg_avg", "isom_new_sg_avg", "pgf_sg_avg")
+stress_avg_label <- c("8-iso-PGF2α", "2,3-dinor-5,6-dihydro-8-iso-PGF2α", "2,3-dinor-8-iso-PGF2α", "PGF2α")
+names(stress_avg_label) <- c("iso_sg_avg", "isom_sg_avg", "isom_new_sg_avg", "pgf_sg_avg")
+
+
+# Unadjusted Models
+
+# Build regression function
+lmer.regression.11 <- function(data) {
+
+  # Create empty dataframe for results
+  results <- data.frame(Phthalate = character(0), Stress = character(0), Beta = numeric(0), conf_low = numeric(0), conf_high = numeric(0))
+
+  # Loop over stress variables
+  for (stress_name in stress_names) {
+    # Loop over phthalate variables
+    for (phthalate_name in phthalate_names_sum) {
+      # Create a formula for the linear mixed-effects model
+      formula <- as.formula(paste("log(", stress_name, ") ~ log(", phthalate_name, ") + ga_visit + (1 | ppt_id)"))
+      # Fit the linear mixed-effects model
+      model <- lmer(formula, data = data)
+      # Get beta, confidence interval
+      coef.beta <- round(fixef(model)[2], 2)
+      conf_intervals <- confint(model)
+      conf_low <- round(conf_intervals[4, 1], 2)
+      conf_high <- round(conf_intervals[4, 2], 2)
+
+            result <- data.frame(
+        Phthalate = phthalate_name,
+        Stress = stress_name,
+        Beta = coef.beta,
+        conf_low = conf_low,
+        conf_high = conf_high
+      )
+      results <- bind_rows(results, result)
+    }
+  }
+
+  return(results)
+}
+
+# Run function
+results_11 <- lmer.regression.11(ph_complete_long)
+
+
+#  Adjusted Models
+
+lmer.regression.22 <- function(data) {
+
+  results <- data.frame(Phthalate = character(0), Stress = character(0), Beta = numeric(0), conf_low = numeric(0), conf_high = numeric(0))
+
+  for (stress_name in stress_names) {
+    for (phthalate_name in phthalate_names_sum) {
+      formula <- as.formula(paste("log(", stress_name, ") ~ log(", phthalate_name, ") + ga_visit + mat_age + mat_educ + ppbmi + (1 | ppt_id)"))
+      model <- lmer(formula, data = data)
+      coef.beta <- round(fixef(model)[2], 2)
+      conf_intervals <- confint(model)
+      conf_low <- round(conf_intervals[4, 1], 2)
+      conf_high <- round(conf_intervals[4, 2], 2)
+
+      result <- data.frame(
+        Phthalate = phthalate_name,
+        Stress = stress_name,
+        Beta = coef.beta,
+        conf_low = conf_low,
+        conf_high = conf_high
+      )
+      results <- bind_rows(results, result)
+    }
+  }
+
+  return(results)
+}
+
+results_22 <- lmer.regression.22(ph_complete_long)
+
+# Format outputs for figure
+
+# Combine outputs
+full_crude_adj_plot <- bind_rows(
+  results_22 %>% mutate(Model = "fully_adjusted"),
+  results_11 %>% mutate(Model = "crude")
+)
+
+
+full_crude_adj_plot$Model <- factor(full_crude_adj_plot$Model, levels = model_label)
+full_crude_adj_plot$Phthalate <- factor(full_crude_adj_plot$Phthalate, levels = phthalate_names_sum)
+
+
+
+fig3 <- ggplot(full_crude_adj_plot, aes(x = Beta, y = Phthalate, color = Phthalate, linetype = Model)) +
+   facet_grid(~Stress) +
+   xlab("Beta (95% Confidence Interval)") +
+   ylab("Phthalate") +
+   ggtitle("Phthalate Metabolites and Oxidative Stress Biomarkers") +
+   labs(linetype = "Model") +
+   scale_y_discrete(labels = p_names_sum) +
+  scale_color_locuszoom() +
+  scale_linetype_manual(values = c("dashed", "solid"), labels = c("Minimally Adjusted", "Fully Adjusted")) + 
+   guides(color = "none", linetype = guide_legend(reverse = TRUE)) + 
+   theme_bw() +
+   theme(axis.text.x = element_text(size = 15, angle = 45, color = "black", vjust = 0.7),
+         axis.text.y = element_text(size = 15, color = "black"),
+         plot.title = element_text(size = 20, face = 'bold', hjust = 0.5),
+         axis.title.x = element_text(size = 15),
+         axis.title.y = element_text(size = 15),
+         legend.title = element_text(size = 15),
+         legend.text = element_text(size = 15),
+         strip.background =element_rect(colour="black",
+                                    fill="white"),
+         strip.text = element_text(size = 10, color = 'black'),
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank())
+fig3
+```
+
+# Figure 4: Stacked bar charts reflecting the direct, indirect, and total effects from mediation models assessing oxidative stress biomarkers as mediators of the relationship between urinary phthalate biomarkers and novelty preference (N = 142)
+
+### Mediation
+
+sum DEHP - iso - nov
+sum DEHP - isom - nov
+sum DEHP - isom.new -nov
+sum DINP - iso - nov
+sum DINP - isom - nov
+sum DINP - isom.new - nov
+sum AA - iso - nov
+sum AA - isom - nov
+sum AA - isom.new - nov
+mep - iso - nov
+mep - isom - nov
+mep - isom.new - nov
+
+## Log data for mediation
+```{r}
+# Create log variables
+ph_complete_wide_VRM$log.sum.DEHP <- log(as.numeric(ph_complete_wide_VRM$sum_DEHP_PBcorrected))
+ph_complete_wide_VRM$log.sum.DINP <- log(as.numeric(ph_complete_wide_VRM$sum_DINP_PBcorrected))
+ph_complete_wide_VRM$log.sum.AA <- log(as.numeric(ph_complete_wide_VRM$sum_AA_PBcorrected))
+ph_complete_wide_VRM$log.mep <- log(as.numeric(ph_complete_wide_VRM$mep_PBcorrected))
+ph_complete_wide_VRM$log.iso <- log(as.numeric(ph_complete_wide_VRM$iso_sg_avg))
+ph_complete_wide_VRM$log.isom <- log(as.numeric(ph_complete_wide_VRM$isom_sg_avg))
+ph_complete_wide_VRM$log.isom.new <- log(as.numeric(ph_complete_wide_VRM$isom_new_sg_avg))
+```
+
+## Table S4: Mediation; regression coefficients and 95% confidence intervals for the direct, indirect, total effects, and proportion mediated from mediation models assessing oxidative stress biomarkers as mediators of the relationship between urinary phthalate biomarkers and novelty preference (N=142).
+
+## Pathway 1
+sum DEHP - 8-iso-PGF2α - novelty pref
+```{r}
+set.seed(1)
+mediate_model <- lm(log.iso ~ log.sum.DEHP + mat_age + mat_educ + ppbmi, data = ph_complete_wide_VRM)
+full_model <- lm(novelty.pref.faces ~ log.sum.DEHP + log.iso + mat_age + mat_educ + ppbmi, data = ph_complete_wide_VRM)
+med <- mediate(mediate_model, full_model, treat = 'log.sum.DEHP', mediator = 'log.iso', data = ph_complete_wide_VRM)
+summary(med)
+```
+## Pathway 2
+sum DEHP - 2,3-dinor-5,6-dihydro-8-iso-PGF2α - novelty pref
+```{r}
+set.seed(1)
+mediate_model <- lm(log.isom ~ log.sum.DEHP + mat_age + mat_educ + ppbmi, data = ph_complete_wide_VRM)
+full_model <- lm(novelty.pref.faces ~ log.sum.DEHP + log.isom + mat_age + mat_educ + ppbmi, data = ph_complete_wide_VRM)
+med <- mediate(mediate_model, full_model, treat = 'log.sum.DEHP', mediator = 'log.isom', data = ph_complete_wide_VRM)
+summary(med)
+```
+## Pathway 3
+sum DEHP - 2,3-dinor-8-iso-PGF2α  - novelty pref
+```{r}
+set.seed(1)
+mediate_model <- lm(log.isom.new ~ log.sum.DEHP + mat_age + mat_educ + ppbmi, data = ph_complete_wide_VRM)
+full_model <- lm(novelty.pref.faces ~ log.sum.DEHP + log.isom.new + mat_age + mat_educ + ppbmi, data = ph_complete_wide_VRM)
+med <- mediate(mediate_model, full_model, treat = 'log.sum.DEHP', mediator = 'log.isom.new', data = ph_complete_wide_VRM)
+summary(med)
+```
+
+## Pathway 4
+sum DINP - 8-iso-PGF2α - novelty pref
+```{r}
+set.seed(1)
+mediate_model <- lm(log.iso ~ log.sum.DINP + mat_age + mat_educ + ppbmi, data = ph_complete_wide_VRM)
+set.seed(1)
+full_model <- lm(novelty.pref.faces ~ log.sum.DINP + log.iso + mat_age + mat_educ + ppbmi, data = ph_complete_wide_VRM)
+set.seed(1)
+med <- mediate(mediate_model, full_model, treat = 'log.sum.DINP', mediator = 'log.iso', data = ph_complete_wide_VRM)
+summary(med)
+```
+## Pathway 5
+sum DINP - 2,3-dinor-5,6-dihydro-8-iso-PGF2α - novelty pref
+```{r}
+set.seed(1)
+mediate_model <- lm(log.isom ~ log.sum.DINP + mat_age + mat_educ + ppbmi, data = ph_complete_wide_VRM)
+full_model <- lm(novelty.pref.faces ~ log.sum.DINP + log.isom + mat_age + mat_educ + ppbmi, data = ph_complete_wide_VRM)
+med <- mediate(mediate_model, full_model, treat = 'log.sum.DINP', mediator = 'log.isom', data = ph_complete_wide_VRM)
+summary(med)
+```
+## Pathway 6
+sum DINP - 2,3-dinor-8-iso-PGF2α - novelty pref
+```{r}
+set.seed(1)
+mediate_model <- lm(log.isom.new ~ log.sum.DINP + mat_age + mat_educ + ppbmi, data = ph_complete_wide_VRM)
+full_model <- lm(novelty.pref.faces ~ log.sum.DINP + log.isom.new + mat_age + mat_educ + ppbmi, data = ph_complete_wide_VRM)
+med <- mediate(mediate_model, full_model, treat = 'log.sum.DINP', mediator = 'log.isom.new', data = ph_complete_wide_VRM)
+summary(med)
+```
+## Pathway 7
+sum AA - 8-iso-PGF2α - novelty pref
+```{r}
+set.seed(1)
+mediate_model <- lm(log.iso ~ log.sum.AA + mat_age + mat_educ + ppbmi, data = ph_complete_wide_VRM)
+full_model <- lm(novelty.pref.faces ~ log.sum.AA + log.iso + mat_age + mat_educ + ppbmi, data = ph_complete_wide_VRM)
+med <- mediate(mediate_model, full_model, treat = 'log.sum.AA', mediator = 'log.iso', data = ph_complete_wide_VRM)
+summary(med)
+```
+## Pathway 8
+sum AA - 2,3-dinor-5,6-dihydro-8-iso-PGF2α - novelty pref
+```{r}
+set.seed(1)
+mediate_model <- lm(log.isom ~ log.sum.AA + mat_age + mat_educ + ppbmi, data = ph_complete_wide_VRM)
+full_model <- lm(novelty.pref.faces ~ log.sum.AA + log.isom + mat_age + mat_educ + ppbmi, data = ph_complete_wide_VRM)
+med <- mediate(mediate_model, full_model, treat = 'log.sum.AA', mediator = 'log.isom', data = ph_complete_wide_VRM)
+summary(med)
+```
+## Pathway 9
+sum AA - 2,3-dinor-8-iso-PGF2α  - novelty pref
+```{r}
+set.seed(1)
+mediate_model <- lm(log.isom.new ~ log.sum.AA + mat_age + mat_educ + ppbmi, data = ph_complete_wide_VRM)
+full_model <- lm(novelty.pref.faces ~ log.sum.AA + log.isom.new + mat_age + mat_educ + ppbmi, data = ph_complete_wide_VRM)
+med <- mediate(mediate_model, full_model, treat = 'log.sum.AA', mediator = 'log.isom.new', data = ph_complete_wide_VRM)
+summary(med)
+```
+## Pathway 10
+mep - 8-iso-PGF2α - novelty pref
+```{r}
+set.seed(1)
+mediate_model <- lm(log.iso ~ log.mep + mat_age + mat_educ + ppbmi, data = ph_complete_wide_VRM)
+full_model <- lm(novelty.pref.faces ~ log.mep + log.iso + mat_age + mat_educ + ppbmi, data = ph_complete_wide_VRM)
+med <- mediate(mediate_model, full_model, treat = 'log.mep', mediator = 'log.iso', data = ph_complete_wide_VRM)
+summary(med)
+```
+## Pathway 11
+mep - 2,3-dinor-5,6-dihydro-8-iso-PGF2α - novelty pref
+```{r}
+mediate_model <- lm(log.isom ~ log.mep + mat_age + mat_educ + ppbmi, data = ph_complete_wide_VRM)
+full_model <- lm(novelty.pref.faces ~ log.mep + log.isom + mat_age + mat_educ + ppbmi, data = ph_complete_wide_VRM)
+med <- mediate(mediate_model, full_model, treat = 'log.mep', mediator = 'log.isom', data = ph_complete_wide_VRM)
+summary(med)
+```
+## Pathway 12
+mep - 2,3-dinor-8-iso-PGF2α  - novelty pref
+```{r}
+set.seed(1)
+mediate_model <- lm(log.isom.new ~ log.mep + mat_age + mat_educ + ppbmi, data = ph_complete_wide_VRM)
+full_model <- lm(novelty.pref.faces ~ log.mep + log.isom.new + mat_age + mat_educ + ppbmi, data = ph_complete_wide_VRM)
+med <- mediate(mediate_model, full_model, treat = 'log.mep', mediator = 'log.isom.new', data = ph_complete_wide_VRM)
+summary(med)
+```
+
+```{r}
+# Read mediation results data
+med <- read.csv(".csv")
+
+# Format for figure
+med_long <- med %>% 
+  pivot_longer(
+    cols = `Direct.Effect`:`Total.Effect`, 
+    names_to = "Effect",
+    values_to = "Value"
+)
+
+# Create labels
+effect_label <- c("Direct Effect", "Indirect Effect", "Total Effect")
+names(effect_label) <- c("Direct.Effect", "Indirect.Effect", "Total.Effect")
+
+stress_label_med <- c("8-iso-PGF2α", "2,3-dinor-5,6-dihydro-8-iso-PGF2α", "2,3-dinor-8-iso-PGF2α")
+med_long$Mediator <- factor(med_long$Mediator, levels = stress_label_med)
+
+fig4 <- ggplot(med_long, aes(x = Exposure, y = Value, color = Effect, fill=Effect, linetype=Effect)) +
+  geom_bar(aes(fill=Effect),stat="identity",position="identity", show.legend = FALSE) +
+  facet_grid(~Mediator) +
+  scale_fill_manual(values = c("lightblue", "#0047AB", "#0047AB00", "transparent"), labels = effect_label) +
+  scale_linetype_manual(values = c("blank", "blank", "dashed")) +
+  scale_color_manual(values = c("black","black", 'black')) +
+  geom_hline(yintercept = 0, size = 0.5) +
+  xlab("Phthalate Exposure") +
+  ylab("Beta") +
+  ggtitle("") +
+  theme_bw() +
+  theme(axis.text.x = element_text(size = 15, angle = 45, color = 'black', vjust = 0.7),
+         axis.text.y = element_text(size = 15, color = 'black'),
+         plot.title = element_text(size = 15, hjust = 0.5),
+         axis.title.x = element_text(size = 15),
+         axis.title.y = element_text(size = 15),
+         legend.title = element_blank(),
+         legend.text = element_text(size = 15),
+         strip.background =element_rect(colour="black",
+                                    fill="white"),
+        strip.text = element_text(size = 15, color = 'black'),
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank())
+fig4
+```
+
+# SUPPLEMENTAL TABLES
+
+## Table S1. Distribution of urinary, specific gravity corrected, individual phthalate biomarkers at 16-18 weeks gestation, in the Illinois Kids Development Study (2014-2016). 
+```{r}
+# Create a list of phthalate names
+phthalate_names <- c(
+  "mcoch_PBcorrected",
+  "monp_PBcorrected",
+  "mecptp_PBcorrected",
+  "mehhtp_PBcorrected",
+  "mcpp_PBcorrected",
+  "mcnp_PBcorrected",
+  "mep_PBcorrected",
+  "mhinch_PBcorrected",
+  "mcop_PBcorrected",
+  "mbp_PBcorrected",
+  "mbzp_PBcorrected",
+  "mhbp_PBcorrected",
+  "mhibp_PBcorrected",
+  "mibp_PBcorrected",
+  "mecpp_PBcorrected",
+  "mehhp_PBcorrected",
+  "mehp_PBcorrected",
+  "meohp_PBcorrected",
+  "sum_DINP_PBcorrected",
+  "sum_DEHP_PBcorrected",
+  "sum_AA_PBcorrected"
+
+)  
+
+## Analytic sample #1
+
+# Initialize an empty result table
+result_table <- tibble()
+
+# Loop through phthalate names
+for (name in phthalate_names) {
+  x <- ph_complete_wide[[name]]
+  mean <- round(geometric.mean(x, na.rm = TRUE), 2)
+  sd <- round(exp(sd(log(x), na.rm = TRUE)), 2)
+  quantile_05 <- round(quantile(na.omit(x), 0.05), 2)
+  quantile_25 <- round(quantile(na.omit(x), 0.25), 2)
+  quantile_50 <- round(quantile(na.omit(x), 0.50), 2)
+  quantile_75 <- round(quantile(na.omit(x), 0.75), 2)
+  quantile_95 <- round(quantile(na.omit(x), 0.95), 2)
+  
+  result_data <- tibble(
+    "Phathalate" = name,
+    "Geometric Mean" = mean,
+    "Geometric Standard Deviation" = sd,
+    "5%" = quantile_05,
+    "25%" = quantile_25,
+    "50%" = quantile_50,
+    "75%" = quantile_75,
+    "95%" = quantile_95
+  )
+  
+# Append the results to the table
+  tables1_1 <- bind_rows(result_table, result_data) 
+}
+
+tables1_1
+
+##### Snalytic sample 2  
+
+result_table <- tibble()
+
+for (name in phthalate_names) {
+  x <- ph_complete_wide_VRM[[name]]
+  mean <- round(geometric.mean(x, na.rm = TRUE), 2)
+  sd <- round(exp(sd(log(x), na.rm = TRUE)), 2)
+  quantile_05 <- round(quantile(na.omit(x), 0.05), 2)
+  quantile_25 <- round(quantile(na.omit(x), 0.25), 2)
+  quantile_50 <- round(quantile(na.omit(x), 0.50), 2)
+  quantile_75 <- round(quantile(na.omit(x), 0.75), 2)
+  quantile_95 <- round(quantile(na.omit(x), 0.95), 2)
+  
+  result_data <- tibble(
+    "Phathalate" = name,
+    "Geometric Mean" = mean,
+    "Geometric Standard Deviation" = sd,
+    "5%" = quantile_05,
+    "25%" = quantile_25,
+    "50%" = quantile_50,
+    "75%" = quantile_75,
+    "95%" = quantile_95
+  )
+  
+  tables2_2 <- bind_rows(result_table, result_data) 
+}
+
+tables2_2
+
+### Calculate % below the LOD
+## analytic sample 1
+round(prop.table(table(ph_complete_wide$mbp_PB_LOD, useNA = 'always')),3)*100
+round(prop.table(table(ph_complete_wide$mbzp_PB_LOD, useNA = 'always')),3)*100
+round(prop.table(table(ph_complete_wide$mcnp_PB_LOD, useNA = 'always')),3)*100
+round(prop.table(table(ph_complete_wide$mcoch_PB_LOD, useNA = 'always')),3)*100
+round(prop.table(table(ph_complete_wide$mcop_PB_LOD, useNA = 'always')),3)*100
+round(prop.table(table(ph_complete_wide$mcpp_PB_LOD, useNA = 'always')),3)*100    
+round(prop.table(table(ph_complete_wide$mecpp_PB_LOD, useNA = 'always')),3)*100    
+round(prop.table(table(ph_complete_wide$mehhp_PB_LOD, useNA = 'always')),3)*100   
+round(prop.table(table(ph_complete_wide$mehp_PB_LOD, useNA = 'always')),3)*100   
+round(prop.table(table(ph_complete_wide$mep_PB_LOD, useNA = 'always')),3)*100   
+round(prop.table(table(ph_complete_wide$mhbp_PB_LOD, useNA = 'always')),3)*100   
+round(prop.table(table(ph_complete_wide$mhibp_PB_LOD, useNA = 'always')),3)*100      
+round(prop.table(table(ph_complete_wide$mhinch_PB_LOD, useNA = 'always')),3)*100     
+round(prop.table(table(ph_complete_wide$mibp_PB_LOD, useNA = 'always')),3)*100     
+round(prop.table(table(ph_complete_wide$mnp_PB_LOD, useNA = 'always')),3)*100           
+round(prop.table(table(ph_complete_wide$meohp_PB_LOD, useNA = 'always')),3)*100 
+
+## analytic sample 2
+round(prop.table(table(ph_complete_wide_VRM$mbp_PB_LOD, useNA = 'always')),3)*100
+round(prop.table(table(ph_complete_wide_VRM$mbzp_PB_LOD, useNA = 'always')),3)*100
+round(prop.table(table(ph_complete_wide_VRM$mcnp_PB_LOD, useNA = 'always')),3)*100
+round(prop.table(table(ph_complete_wide_VRM$mcoch_PB_LOD, useNA = 'always')),3)*100
+round(prop.table(table(ph_complete_wide_VRM$mcop_PB_LOD, useNA = 'always')),3)*100
+round(prop.table(table(ph_complete_wide_VRM$mcpp_PB_LOD, useNA = 'always')),3)*100    
+round(prop.table(table(ph_complete_wide_VRM$mecpp_PB_LOD, useNA = 'always')),3)*100    
+round(prop.table(table(ph_complete_wide_VRM$mehhp_PB_LOD, useNA = 'always')),3)*100   
+round(prop.table(table(ph_complete_wide_VRM$mehp_PB_LOD, useNA = 'always')),3)*100   
+round(prop.table(table(ph_complete_wide_VRM$mep_PB_LOD, useNA = 'always')),3)*100   
+round(prop.table(table(ph_complete_wide_VRM$mhbp_PB_LOD, useNA = 'always')),3)*100   
+round(prop.table(table(ph_complete_wide_VRM$mhibp_PB_LOD, useNA = 'always')),3)*100      
+round(prop.table(table(ph_complete_wide_VRM$mhinch_PB_LOD, useNA = 'always')),3)*100     
+round(prop.table(table(ph_complete_wide_VRM$mibp_PB_LOD, useNA = 'always')),3)*100     
+round(prop.table(table(ph_complete_wide_VRM$mnp_PB_LOD, useNA = 'always')),3)*100           
+round(prop.table(table(ph_complete_wide_VRM$meohp_PB_LOD, useNA = 'always')),3)*100 
+```
+
+## Table S2: Estimated associations between natural log transformed, specific gravity corrected phthalate biomarkers and oxidative stress biomarkers, estimated using linear mixed effect models in the Illinois Kids Development Study. 
+```{r}
+# Linear Mixed Effect Modeling
+# Unadjusted
+lmer.regression.1 <- function(data) {
+
+  results <- data.frame(Phthalate = character(0), Stress = character(0), Beta = numeric(0), conf_low = numeric(0), conf_high = numeric(0))
+
+  for (stress_name in stress_names) {
+    for (phthalate_name in phthalate_names) {
+      formula <- as.formula(paste("log(", stress_name, ") ~ log(", phthalate_name, ") + ga_visit + (1 | ppt_id)"))
+      model <- lmer(formula, data = data)
+      coef.beta <- round(fixef(model)[2], 2)
+      conf_intervals <- confint(model)
+      conf_low <- round(conf_intervals[4, 1], 2)
+      conf_high <- round(conf_intervals[4, 2], 2)
+
+      result <- data.frame(
+        Phthalate = phthalate_name,
+        Stress = stress_name,
+        Beta = coef.beta,
+        conf_low = conf_low,
+        conf_high = conf_high
+      )
+      results <- bind_rows(results, result)
+    }
+  }
+
+  return(results)
+}
+
+results_unadj <- lmer.regression.1(ph_complete_long)
+results_unadj
+
+# Adjusted
+lmer.regression.2 <- function(data) {
+
+  results <- data.frame(Phthalate = character(0), Stress = character(0), Beta = numeric(0), conf_low = numeric(0), conf_high = numeric(0))
+
+  for (stress_name in stress_names) {
+    for (phthalate_name in phthalate_names) {
+      formula <- as.formula(paste("log(", stress_name, ") ~ log(", phthalate_name, ") + ga_visit + mat_age + mat_educ + ppbmi + (1 | ppt_id)"))
+      model <- lmer(formula, data = data)
+      coef.beta <- round(fixef(model)[2], 2)
+      conf_intervals <- confint(model)
+      conf_low <- round(conf_intervals[4, 1], 2)
+      conf_high <- round(conf_intervals[4, 2], 2)
+
+      result <- data.frame(
+        Phthalate = phthalate_name,
+        Stress = stress_name,
+        Beta = coef.beta,
+        conf_low = conf_low,
+        conf_high = conf_high
+      )
+      results <- bind_rows(results, result)
+    }
+  }
+
+  return(results)
+}
+
+results_adj <- lmer.regression.2(ph_complete_long)
+results_adj_lmer
+```
+
+## Table S3: Adjusted associations between natural log transformed, specific gravity corrected phthalate biomarkers and averaged, oxidative stress biomarkers, estimated using linear regression in the Illinois Kids Development Study (N=221).
+```{r}
+# Multiple Linear Regression
+lm.regression.3 <- function(data) {
+
+  results <- data.frame(Phthalate = character(0), Stress = character(0), Beta = numeric(0), conf_low = numeric(0), conf_high = numeric(0))
+
+  for (stress_name in stress_avg_names) {
+    for (phthalate_name in phthalate_names) {
+      formula <- as.formula(paste("log(", stress_name, ") ~ log(", phthalate_name, ") + mat_age + mat_educ + ppbmi"))
+      model <- lm(formula, data = data)
+      # Get beta and its confidence interval
+      coef.beta <- round(coef(model)[2], 2)
+      conf_intervals <- confint(model)
+      conf_low <- round(conf_intervals[2, 1], 2)
+      conf_high <- round(conf_intervals[2, 2], 2)
+
+      result <- data.frame(
+        Phthalate = phthalate_name,
+        Stress = stress_name,
+        Beta = coef.beta,
+        conf_low = conf_low,
+        conf_high = conf_high
+      )
+      results <- bind_rows(results, result)
+    }
+  }
+
+  return(results)
+}
+
+results_adj <- lm.regression.3(ph_complete_wide)
+results_adj_mr
+
+```
+
