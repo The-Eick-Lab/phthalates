@@ -1,2 +1,1 @@
-# Phthalates
-Projects relating to phthalates
+Projects relating to phthalates.
